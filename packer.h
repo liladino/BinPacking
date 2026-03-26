@@ -1,12 +1,9 @@
+#ifndef PACKER_H
+#define PACKER_H
+
 #include "bin.h"
-#include <iostream>
 #include <vector>
 #include <set>
-
-using std::array;
-using std::vector;
-using std::set;
-using std::pair;
 
 class GreedyPack {
 	struct ComparePOI {
@@ -17,9 +14,9 @@ class GreedyPack {
 		}
 	};
 
-	vector<Bin3> packed;
-	set<Position3, ComparePOI> pointsOfInterest;
-	array<size_t, 3> limits;
+	std::vector<Bin3> packed;
+	std::set<Position3, ComparePOI> pointsOfInterest;
+	std::array<size_t, 3> limits;
 public:
 	GreedyPack(){
 		packed = {};
@@ -74,14 +71,5 @@ public:
 	}
 };
 
-int main(){
-	GreedyPack greedy;
-	greedy.setLimits(150,20,15);
-	int i = 0;
-	while (greedy.pack(Bin3(1, 2, 3))) {
-		i++;
-	}
-	std::cout << i << std::endl;
 
-	return 0;
-}
+#endif

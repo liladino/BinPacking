@@ -117,8 +117,6 @@ public:
 	}
 
 	bool pack(Bin3 toPack) {
-		//std::sort(pointsOfInterest.begin(), pointsOfInterest.end(), comparePoints);
-
 		for (auto& p : pointsOfInterest) {
 			toPack.setPos(p);
 			if (!fitsWithinLimits(toPack)) continue;

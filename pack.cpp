@@ -1,69 +1,12 @@
+#include "bin.h"
 #include <iostream>
-#include <array>
 #include <vector>
-#include <utility>
-#include <optional>
 #include <set>
 
 using std::array;
 using std::vector;
 using std::set;
 using std::pair;
-using std::optional;
-
-struct Position3 {
-	array<size_t, 3> coords;
-	Position3(){ coords = {}; }
-	Position3(size_t x, size_t y, size_t z){ coords = {x, y, z};}
-	
-	//consts:
-	size_t operator[](size_t index) const{
-		return coords[index];
-	}
-	
-	//references:
-	size_t& operator[](size_t index){
-		return coords[index];
-	}
-};
-
-struct Bin3 {
-	array<size_t, 3> extent;
-	Position3 position;
-
-	Bin3(){ 
-		extent = {0, 0, 0};
-	}
-	Bin3(size_t x, size_t y, size_t z){ 
-		extent = {x, y, z};
-	}
-
-	void setPos(const Position3& p){
-		position = p;
-	}
-
-	//consts: 
-	size_t operator[](size_t index) const {
-		return extent[index];
-	}
-	const Position3& getPos() const {
-		return position;
-	}
-	size_t getPos(size_t index) const {
-		return position[index];
-	}
-
-	//references:
-	size_t& operator[](size_t index) {
-		return extent[index];
-	}
-	Position3& getPos() {
-		return position;
-	}
-	size_t& getPos(size_t index) {
-		return position[index];
-	}
-};
 
 class GreedyPack {
 	struct ComparePOI {

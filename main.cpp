@@ -1,5 +1,5 @@
-#include "bin.h"
-#include "packer.h"
+#include "Bin.h"
+#include "GreedyPacker.h"
 #include <iostream>
 
 using std::array;
@@ -8,7 +8,7 @@ using std::set;
 using std::pair;
 
 int main(){
-	GreedyPack greedy;
+	GreedyPacker greedy;
 	greedy.setLimits(150,20,15);
 	int i = 0;
 	while (greedy.pack(Bin3(1, 2, 3))) {

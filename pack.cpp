@@ -3,9 +3,11 @@
 #include <vector>
 #include <utility>
 #include <optional>
+#include <set>
 
 using std::array;
 using std::vector;
+using std::set;
 using std::pair;
 using std::optional;
 
@@ -64,13 +66,21 @@ struct Bin3 {
 };
 
 class GreedyPack {
+	struct ComparePOI {
+		bool operator()(const Position3& a, const Position3& b) const {
+			if (a[2] != b[2]) return a[2] < b[2]; // z
+			if (a[1] != b[1]) return a[1] < b[1]; // y
+			return a[0] < b[0];                   // x
+		}
+	};
+
 	vector<Bin3> packed;
-	vector<Position3> pointsOfInterest;
+	set<Position3, ComparePOI> pointsOfInterest;
 	array<size_t, 3> limits;
 public:
 	GreedyPack(){
 		packed = {};
-		pointsOfInterest = {Position3(0, 0, 0)};
+		pointsOfInterest.insert(Position3(0, 0, 0));
 		limits = {1, 1, 1};
 	}
 	void setLimits(size_t x, size_t y, size_t z){ limits = {x, y, z}; }
@@ -101,9 +111,9 @@ public:
 
 	void updatePOI(Bin3& toPack){
 		auto& pos = toPack.getPos(); 
-		pointsOfInterest.push_back({pos[0] + toPack[0], pos[1], pos[2]}); 
-  	  	pointsOfInterest.push_back({pos[0], pos[1] + toPack[1], pos[2]});
-   		pointsOfInterest.push_back({pos[0], pos[1], pos[2] + toPack[2]});
+		pointsOfInterest.insert({pos[0] + toPack[0], pos[1], pos[2]}); 
+  	  	pointsOfInterest.insert({pos[0], pos[1] + toPack[1], pos[2]});
+   		pointsOfInterest.insert({pos[0], pos[1], pos[2] + toPack[2]});
 	}
 
 	bool pack(Bin3 toPack) {
@@ -116,6 +126,7 @@ public:
 
 			packed.push_back(toPack);
 			updatePOI(toPack);
+			pointsOfInterest.erase(p);
 			return true;
 		}
 		return false;
@@ -124,9 +135,9 @@ public:
 
 int main(){
 	GreedyPack greedy;
-	greedy.setLimits(3, 4, 5);
+	greedy.setLimits(150,20,15);
 	int i = 0;
-	while (greedy.pack(Bin3(1, 2, 1))) {
+	while (greedy.pack(Bin3(1, 2, 3))) {
 		i++;
 	}
 	std::cout << i << std::endl;

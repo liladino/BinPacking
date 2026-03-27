@@ -5,10 +5,10 @@
 #include <array>
 #include <utility>
 
-struct Position3 {
+struct Vec3 {
 	std::array<size_t, 3> coords;
-	Position3(){ coords = {}; }
-	Position3(size_t x, size_t y, size_t z){ coords = {x, y, z};}
+	Vec3(){ coords = {}; }
+	Vec3(size_t x, size_t y, size_t z){ coords = {x, y, z};}
 	
 	//consts:
 	size_t operator[](size_t index) const{
@@ -23,7 +23,7 @@ struct Position3 {
 
 struct Bin3 {
 	std::array<size_t, 3> extent;
-	Position3 position;
+	Vec3 position;
 
 	Bin3(){ 
 		extent = {0, 0, 0};
@@ -32,15 +32,19 @@ struct Bin3 {
 		extent = {x, y, z};
 	}
 
-	void setPos(const Position3& p){
+	void setPos(const Vec3& p){
 		position = p;
+	}
+
+	size_t volume(){
+		return extent[0] * extent[1] * extent[2];
 	}
 
 	//consts: 
 	size_t operator[](size_t index) const {
 		return extent[index];
 	}
-	const Position3& getPos() const {
+	const Vec3& getPos() const {
 		return position;
 	}
 	size_t getPos(size_t index) const {
@@ -51,7 +55,7 @@ struct Bin3 {
 	size_t& operator[](size_t index) {
 		return extent[index];
 	}
-	Position3& getPos() {
+	Vec3& getPos() {
 		return position;
 	}
 	size_t& getPos(size_t index) {

@@ -6,18 +6,18 @@
 
 class GreedyPacker : public Packer {
 	struct ComparePOI {
-		bool operator()(const Position3& a, const Position3& b) const {
+		bool operator()(const Vec3& a, const Vec3& b) const {
 			if (a[2] != b[2]) return a[2] < b[2]; // z
 			if (a[1] != b[1]) return a[1] < b[1]; // y
 			return a[0] < b[0];                   // x
 		}
 	};
 
-	std::set<Position3, ComparePOI> pointsOfInterest;
+	std::set<Vec3, ComparePOI> pointsOfInterest;
 public:
 	GreedyPacker(){
 		packed = {};
-		pointsOfInterest.insert(Position3(0, 0, 0));
+		pointsOfInterest.insert(Vec3(0, 0, 0));
 		limits = {1, 1, 1};
 	}
 

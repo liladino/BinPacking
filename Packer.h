@@ -36,6 +36,15 @@ public:
 		return true;
 	}
 
+	size_t volume(){
+		return limits[0] * limits[1] * limits[2];
+	}
+	size_t usedVolume(){
+		size_t acc = 0;
+		for (auto& x : packed) acc += x.volume(); 
+		return acc;
+	}
+
 	virtual bool pack(Bin3 toPack) = 0;
 
     virtual ~Packer() = default;

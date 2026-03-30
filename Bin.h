@@ -36,7 +36,7 @@ struct Bin3 {
 		position = p;
 	}
 
-	size_t volume(){
+	size_t volume() const {
 		return extent[0] * extent[1] * extent[2];
 	}
 

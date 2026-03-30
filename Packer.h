@@ -10,14 +10,15 @@ protected:
 	std::vector<Bin3> packed;
 	std::array<size_t, 3> limits;
 public:
+	// updates the admissible container dimensions; derived packers decide whether and how internal search structures are updated.
 	void setLimits(size_t x, size_t y, size_t z){ limits = {x, y, z}; }
 
-	bool intersects(const Bin3& A, const Bin3& B) const {
-		for (size_t i = 0; i < 3; i++){
-			if (A.getPos(i) >= B.getPos(i) + B[i] ||
-				B.getPos(i) >= A.getPos(i) + A[i]) {
-				return false;
-			}
+	bool intersects(const Bin3& a, const Bin3& b) const {
+		for (size_t i = 0; i < 3; ++i) {
+			const bool separated =
+				a.getPos(i) + a[i] <= b.getPos(i) ||
+				b.getPos(i) + b[i] <= a.getPos(i);
+			if (separated) return false;
 		}
 		return true;
 	}
@@ -36,10 +37,10 @@ public:
 		return true;
 	}
 
-	size_t volume(){
+	size_t volume() const {
 		return limits[0] * limits[1] * limits[2];
 	}
-	size_t usedVolume(){
+	size_t usedVolume() const {
 		size_t acc = 0;
 		for (auto& x : packed) acc += x.volume(); 
 		return acc;

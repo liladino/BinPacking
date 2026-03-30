@@ -15,6 +15,8 @@ using std::endl;
 
 map<string, Vec3> limits = 
 {
+	{"test1", {10, 10, 10}},
+	{"test2", {12, 10, 12}},
 	{"xs", {235, 150, 120}},
 	{"s", {300, 240,  60}},
 	{"m", {500, 300, 140}},
@@ -24,6 +26,7 @@ map<string, Vec3> limits =
 
 vector<vector<string>> chains = 
 {
+	// {"test1", "test2"},
 	{"xs", "m", "l", "xl"},
 	{"s",  "m", "l", "xl"}
 };
@@ -36,7 +39,7 @@ void iterativeSimulation(size_t chainIndex, size_t items[], size_t n){
 	size_t chain_j = 0, i = 0, packed = 0;
 
 	while (packed < n) {
-		cout << "Trying to pack " << packed+1 << "." << endl;
+		// cout << "Trying to pack " << packed+1 << "." << endl;
 		if (greedy.pack(Bin3(items[i], items[i+1], items[i+2]))) {
 			packed++;
 			i += 3;
@@ -61,10 +64,10 @@ void iterativeSimulation(size_t chainIndex, size_t items[], size_t n){
 }
 
 int main(){
-	srand(time(NULL));
+	//srand(time(NULL));
 	vector<size_t> items;
-	for (int i = 1; i <= 15*3; i++){
-		items.push_back(rand() % 200 + 30);
+	for (int i = 1; i <= 30*3; i++){
+		items.push_back(rand() % 150 + 50);
 	}
 
 	iterativeSimulation(0, items.data(), items.size()/3);

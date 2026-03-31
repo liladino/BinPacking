@@ -2,6 +2,7 @@
 #define PACKER_H
 
 #include "Bin.h"
+#include "IRotationPolicy.h"
 #include <vector>
 #include <set>
 

@@ -11,7 +11,7 @@
 class Packer {
 protected:
 	std::vector<Item> packed;
-	Vec3 limits;
+	Vec3 binSize;
 	std::unique_ptr<IRotationPolicy> rotationPolicy;
 public:
 	/* Sets the limits of the container.
@@ -20,7 +20,7 @@ public:
 	void setLimits(size_t x, size_t y, size_t z){ 
 		std::vector<size_t> v = {x, y, z}; 
 		std::sort(v.begin(), v.end(), std::greater<size_t>());
-		limits = {v[0], v[1], v[2]}; 
+		binSize = {v[0], v[1], v[2]}; 
 	}
 	
 	void setPolicy(std::unique_ptr<IRotationPolicy> rotationPolicy) {
@@ -46,13 +46,13 @@ public:
 	
 	bool fitsWithinLimits(const Item& toPack) const {
 		for (size_t i = 0; i < 3; i++){
-			if (toPack.getPos(i) + toPack[i] > limits[i]) return false;
+			if (toPack.getPos(i) + toPack[i] > binSize[i]) return false;
 		}
 		return true;
 	}
 
 	size_t volume() const {
-		return limits[0] * limits[1] * limits[2];
+		return binSize[0] * binSize[1] * binSize[2];
 	}
 	size_t usedVolume() const {
 		size_t acc = 0;

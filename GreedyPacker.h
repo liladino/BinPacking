@@ -23,7 +23,7 @@ class GreedyPacker : public Packer {
 	void init(){
 		packed = {};
 		pointsOfInterest.insert(Vec3(0, 0, 0));
-		limits = {1, 1, 1};
+		binSize = {1, 1, 1};
 	}
 public:
 	GreedyPacker(){
@@ -39,7 +39,7 @@ public:
 			toPack.setPos(*it);
 
 			if (nullptr != rotationPolicy){
-				rotationPolicy->rotateBin(toPack, limits);
+				rotationPolicy->rotateBin(toPack, binSize);
 			}
 
 			if (!fitsWithinLimits(toPack)) continue;

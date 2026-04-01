@@ -28,10 +28,12 @@ interface IRotationPolicy {
 
 class RP_largestFaceUp
 class RP_minLeftoverSlack
+class RP_tryFirstFitting
 
 Packer <|--GreedyPacker
 Packer *-right- IRotationPolicy
 IRotationPolicy <|-- RP_largestFaceUp
 IRotationPolicy <|-- RP_minLeftoverSlack
+IRotationPolicy <|-- RP_tryFirstFitting
 
 @enduml

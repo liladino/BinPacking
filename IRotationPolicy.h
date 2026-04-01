@@ -11,14 +11,14 @@ struct IRotationPolicy {
 	/* toPack: rotate this Bin. It's intended position should be loaded.
 	 * limits: dimensions of the current container
 	 */
-	virtual void rotateBin(Item& toPack, const Vec3& limits) = 0;
+	virtual void rotateBin(Item& toPack, const Vec3& binSize) = 0;
 };
 
 struct RP_largestFaceUp : IRotationPolicy {
 	/* Order the edges of the bin into a decreasing order.
 	 * This way, the largest face will be x-y (and such the smallest will be height z)
 	 */
-	void rotateBin(Item& toPack, const Vec3& limits) override {
+	void rotateBin(Item& toPack, const Vec3& binSize) override {
 		std::sort(toPack.extent.begin(), toPack.extent.end(), std::greater<size_t>());
 	}
 };
@@ -28,7 +28,7 @@ struct RP_tryFirstFitting : IRotationPolicy {
      * which fits within the limits. If none fits, return the 6th 
      * without check - the caller checks it anyway.
 	 */
-	void rotateBin(Item& toPack, const Vec3& limits) override {
+	void rotateBin(Item& toPack, const Vec3& binSize) override {
 		const static Vec3 rotations[] = 
 			{   
 				{0, 2, 1},
@@ -45,7 +45,7 @@ struct RP_tryFirstFitting : IRotationPolicy {
 				size_t src = rotations[i][j];
 				long long dim = toPack[src];
 
-				if (limits[j] < toPack.getPos(j) + dim) {
+				if (binSize[j] < toPack.getPos(j) + dim) {
                     fits = false;
                     break;
                 }
@@ -71,7 +71,7 @@ struct RP_minLeftoverSlack : IRotationPolicy {
 	/* Order the edges of the bin to minimize leftover slack, 
 	 * relative to the current container.
 	 */	 
-	void rotateBin(Item& toPack, const Vec3& limits) override {
+	void rotateBin(Item& toPack, const Vec3& binSize) override {
 		const static Vec3 rotations[] = 
 			{   
 				{0, 1, 2},
@@ -97,7 +97,7 @@ struct RP_minLeftoverSlack : IRotationPolicy {
 			for (size_t j = 0; j < 3; j++) {
 				size_t src = rotations[i][j];
 				long long dim = toPack[src];
-				long long slackj = limits[j] - (toPack.getPos(j) + dim);
+				long long slackj = binSize[j] - (toPack.getPos(j) + dim);
 
 				if (slackj < 0) {
 					slack = LLONG_MAX;

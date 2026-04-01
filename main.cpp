@@ -31,13 +31,19 @@ vector<vector<string>> chains =
 	{"s",  "m", "l", "xl"}
 };
 
+int g_policy = 0; 
+
 void iterativeSimulation(size_t chainIndex, size_t items[], size_t n){
 	GreedyPacker greedy;
 	auto& limit = limits[chains[chainIndex][0]];
 	greedy.setLimits(limit[0], limit[1], limit[2]);
 
-	// greedy.setPolicy(std::make_unique<RP_largestFaceUp>());
-	greedy.setPolicy(std::make_unique<RP_minLeftoverSlack>());
+	switch (g_policy){
+		case 1: greedy.setPolicy(std::make_unique<RP_largestFaceUp>()); break;
+		case 2: greedy.setPolicy(std::make_unique<RP_minLeftoverSlack>()); break;
+		case 3: greedy.setPolicy(std::make_unique<RP_tryFirstFitting>()); break;
+		default: break;
+	}
 
 	size_t chain_j = 0, i = 0, packed = 0;
 
@@ -52,9 +58,10 @@ void iterativeSimulation(size_t chainIndex, size_t items[], size_t n){
 				chain_j++;
 				limit = limits[chains[chainIndex][chain_j]];
 				greedy.setLimits(limit[0], limit[1], limit[2]);
-				cout << "Resized to " << chains[chainIndex][chain_j] << " bin." << endl;
+				cout << "at " << packed+1 << ". resized to " << chains[chainIndex][chain_j] << " bin." << endl;
 			}
 			else{
+				cout << "Couldn't fit " << packed+1 << "." << endl;
 				break;
 			}
 		}
@@ -68,12 +75,17 @@ void iterativeSimulation(size_t chainIndex, size_t items[], size_t n){
 
 int main(){
 	//srand(time(NULL));
+	srand(8);
 	vector<size_t> items;
-	for (int i = 1; i <= 30*3; i++){
-		items.push_back(rand() % 150 + 50);
+	for (int i = 1; i <= 100*3; i++){
+		items.push_back(rand() % 120 + 50);
 	}
 
-	iterativeSimulation(0, items.data(), items.size()/3);
+	cout << "----------------------------------------------\n";
+	for (g_policy = 0; g_policy < 4; g_policy++){
+		cout << "\nPolicy: " << g_policy << endl;
+		iterativeSimulation(0, items.data(), items.size()/3);
+	}
 
 	return 0;
 }

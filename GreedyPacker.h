@@ -1,7 +1,7 @@
 #ifndef GREEDYPACKER_H
 #define GREEDYPACKER_H
 
-#include "Bin.h"
+#include "Item.h"
 #include "Packer.h"
 #include <memory>
 

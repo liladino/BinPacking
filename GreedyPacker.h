@@ -13,10 +13,13 @@ class GreedyPacker : public Packer {
 			return a[0] < b[0];                   // x
 		}
 	};
-
 	std::set<Vec3, ComparePOI> pointsOfInterest;
-
-	std::unique_ptr<IRotationPolicy> rotationPolicy;
+	void updatePOI(const Bin3& toPack){
+		auto& pos = toPack.getPos(); 
+		pointsOfInterest.insert({pos[0] + toPack[0], pos[1], pos[2]}); 
+		pointsOfInterest.insert({pos[0], pos[1] + toPack[1], pos[2]});
+		pointsOfInterest.insert({pos[0], pos[1], pos[2] + toPack[2]});
+	}
 	void init(){
 		packed = {};
 		pointsOfInterest.insert(Vec3(0, 0, 0));
@@ -26,18 +29,9 @@ public:
 	GreedyPacker(){
 		init();
 	}
-	GreedyPacker(std::unique_ptr<IRotationPolicy> rotationPolicy) : rotationPolicy(std::move(rotationPolicy)) {
+	GreedyPacker(std::unique_ptr<IRotationPolicy> rotationPolicy) {
 		init();
-	}
-	void setPolicy(std::unique_ptr<IRotationPolicy> rotationPolicy) {
 		this->rotationPolicy = std::move(rotationPolicy);
-	}
-	
-	void updatePOI(const Bin3& toPack){
-		auto& pos = toPack.getPos(); 
-		pointsOfInterest.insert({pos[0] + toPack[0], pos[1], pos[2]}); 
-  	  	pointsOfInterest.insert({pos[0], pos[1] + toPack[1], pos[2]});
-   		pointsOfInterest.insert({pos[0], pos[1], pos[2] + toPack[2]});
 	}
 
 	virtual bool pack(Bin3 toPack) override {

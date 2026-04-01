@@ -5,12 +5,14 @@
 #include "IRotationPolicy.h"
 #include <vector>
 #include <set>
+#include <memory>
 #include <algorithm>
 
 class Packer {
 protected:
 	std::vector<Bin3> packed;
 	Vec3 limits;
+	std::unique_ptr<IRotationPolicy> rotationPolicy;
 public:
 	/* Sets the limits of the container.
 	 * Automatically sets the order to stand on its larget face.
@@ -19,6 +21,10 @@ public:
 		std::vector<size_t> v = {x, y, z}; 
 		std::sort(v.begin(), v.end(), std::greater<size_t>());
 		limits = {v[0], v[1], v[2]}; 
+	}
+	
+	void setPolicy(std::unique_ptr<IRotationPolicy> rotationPolicy) {
+		this->rotationPolicy = std::move(rotationPolicy);
 	}
 
 	bool intersects(const Bin3& a, const Bin3& b) const {

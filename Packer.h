@@ -5,14 +5,21 @@
 #include "IRotationPolicy.h"
 #include <vector>
 #include <set>
+#include <algorithm>
 
 class Packer {
 protected:
 	std::vector<Bin3> packed;
-	std::array<size_t, 3> limits;
+	Vec3 limits;
 public:
-	// updates the admissible container dimensions; derived packers decide whether and how internal search structures are updated.
-	void setLimits(size_t x, size_t y, size_t z){ limits = {x, y, z}; }
+	/* Sets the limits of the container.
+	 * Automatically sets the order to stand on its larget face.
+	 */
+	void setLimits(size_t x, size_t y, size_t z){ 
+		std::vector<size_t> v = {x, y, z}; 
+		std::sort(v.begin(), v.end(), std::greater<size_t>());
+		limits = {v[0], v[1], v[2]}; 
+	}
 
 	bool intersects(const Bin3& a, const Bin3& b) const {
 		for (size_t i = 0; i < 3; ++i) {
@@ -53,4 +60,4 @@ public:
 };
 
 
-#endif
+#endif 

@@ -19,6 +19,13 @@ struct Vec3 {
 	size_t& operator[](size_t index){
 		return coords[index];
 	}
+
+	bool operator<(const Vec3& other) const {
+		if (coords[0] != other[0]) return coords[0] < other[0];
+		if (coords[1] != other[1]) return coords[1] < other[1];
+		if (coords[2] != other[2]) return coords[2] < other[2];
+		return false;
+	}
 };
 
 struct Bin3 {

@@ -36,6 +36,9 @@ void iterativeSimulation(size_t chainIndex, size_t items[], size_t n){
 	auto& limit = limits[chains[chainIndex][0]];
 	greedy.setLimits(limit[0], limit[1], limit[2]);
 
+	// greedy.setPolicy(std::make_unique<RP_largestFaceUp>());
+	greedy.setPolicy(std::make_unique<RP_minLeftoverSlack>());
+
 	size_t chain_j = 0, i = 0, packed = 0;
 
 	while (packed < n) {

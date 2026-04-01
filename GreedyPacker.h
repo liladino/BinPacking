@@ -3,6 +3,7 @@
 
 #include "Bin.h"
 #include "Packer.h"
+#include <memory>
 
 class GreedyPacker : public Packer {
 	struct ComparePOI {
@@ -14,13 +15,24 @@ class GreedyPacker : public Packer {
 	};
 
 	std::set<Vec3, ComparePOI> pointsOfInterest;
-public:
-	GreedyPacker(){
+
+	std::unique_ptr<IRotationPolicy> rotationPolicy;
+	void init(){
 		packed = {};
 		pointsOfInterest.insert(Vec3(0, 0, 0));
 		limits = {1, 1, 1};
 	}
-
+public:
+	GreedyPacker(){
+		init();
+	}
+	GreedyPacker(std::unique_ptr<IRotationPolicy> rotationPolicy) : rotationPolicy(std::move(rotationPolicy)) {
+		init();
+	}
+	void setPolicy(std::unique_ptr<IRotationPolicy> rotationPolicy) {
+		this->rotationPolicy = std::move(rotationPolicy);
+	}
+	
 	void updatePOI(const Bin3& toPack){
 		auto& pos = toPack.getPos(); 
 		pointsOfInterest.insert({pos[0] + toPack[0], pos[1], pos[2]}); 
@@ -31,6 +43,10 @@ public:
 	virtual bool pack(Bin3 toPack) override {
 		for (auto it = pointsOfInterest.begin(); it != pointsOfInterest.end(); ++it) {
 			toPack.setPos(*it);
+
+			if (nullptr != rotationPolicy){
+				rotationPolicy->rotateBin(toPack, limits);
+			}
 
 			if (!fitsWithinLimits(toPack)) continue;
 			if (intersectsAny(toPack)) continue;

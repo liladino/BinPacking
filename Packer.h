@@ -1,7 +1,7 @@
 #ifndef PACKER_H
 #define PACKER_H
 
-#include "Bin.h"
+#include "Item.h"
 #include "IRotationPolicy.h"
 #include <vector>
 #include <set>
@@ -10,7 +10,7 @@
 
 class Packer {
 protected:
-	std::vector<Bin3> packed;
+	std::vector<Item> packed;
 	Vec3 limits;
 	std::unique_ptr<IRotationPolicy> rotationPolicy;
 public:
@@ -27,7 +27,7 @@ public:
 		this->rotationPolicy = std::move(rotationPolicy);
 	}
 
-	bool intersects(const Bin3& a, const Bin3& b) const {
+	bool intersects(const Item& a, const Item& b) const {
 		for (size_t i = 0; i < 3; ++i) {
 			const bool separated =
 				a.getPos(i) + a[i] <= b.getPos(i) ||
@@ -37,14 +37,14 @@ public:
 		return true;
 	}
 
-	bool intersectsAny(const Bin3& toPack) const {
+	bool intersectsAny(const Item& toPack) const {
 		for (const auto& b : packed){
 			if (intersects(b, toPack)) return true;
 		}
 		return false;
 	}
 	
-	bool fitsWithinLimits(const Bin3& toPack) const {
+	bool fitsWithinLimits(const Item& toPack) const {
 		for (size_t i = 0; i < 3; i++){
 			if (toPack.getPos(i) + toPack[i] > limits[i]) return false;
 		}
@@ -60,7 +60,7 @@ public:
 		return acc;
 	}
 
-	virtual bool pack(Bin3 toPack) = 0;
+	virtual bool pack(Item toPack) = 0;
 
     virtual ~Packer() = default;
 };

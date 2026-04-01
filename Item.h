@@ -20,22 +20,22 @@ struct Vec3 {
 		return coords[index];
 	}
 
-	bool operator<(const Vec3& other) const {
-		if (coords[0] != other[0]) return coords[0] < other[0];
-		if (coords[1] != other[1]) return coords[1] < other[1];
-		if (coords[2] != other[2]) return coords[2] < other[2];
-		return false;
-	}
+	// bool operator<(const Vec3& other) const {
+	// 	if (coords[0] != other[0]) return coords[0] < other[0];
+	// 	if (coords[1] != other[1]) return coords[1] < other[1];
+	// 	if (coords[2] != other[2]) return coords[2] < other[2];
+	// 	return false;
+	// }
 };
 
-struct Bin3 {
+struct Item {
 	std::array<size_t, 3> extent;
 	Vec3 position;
 
-	Bin3(){ 
+	Item(){ 
 		extent = {0, 0, 0};
 	}
-	Bin3(size_t x, size_t y, size_t z){ 
+	Item(size_t x, size_t y, size_t z){ 
 		extent = {x, y, z};
 	}
 

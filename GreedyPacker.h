@@ -14,7 +14,7 @@ class GreedyPacker : public Packer {
 		}
 	};
 	std::set<Vec3, ComparePOI> pointsOfInterest;
-	void updatePOI(const Bin3& toPack){
+	void addCornersToPOI(const Item& toPack){
 		auto& pos = toPack.getPos(); 
 		pointsOfInterest.insert({pos[0] + toPack[0], pos[1], pos[2]}); 
 		pointsOfInterest.insert({pos[0], pos[1] + toPack[1], pos[2]});
@@ -34,7 +34,7 @@ public:
 		this->rotationPolicy = std::move(rotationPolicy);
 	}
 
-	virtual bool pack(Bin3 toPack) override {
+	virtual bool pack(Item toPack) override {
 		for (auto it = pointsOfInterest.begin(); it != pointsOfInterest.end(); ++it) {
 			toPack.setPos(*it);
 
@@ -46,7 +46,7 @@ public:
 			if (intersectsAny(toPack)) continue;
 
 			packed.push_back(toPack);
-			updatePOI(toPack);
+			addCornersToPOI(toPack);
 			pointsOfInterest.erase(it);
 			
 			return true;

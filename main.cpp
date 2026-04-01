@@ -1,4 +1,4 @@
-#include "Bin.h"
+#include "Item.h"
 #include "GreedyPacker.h"
 #include <iostream>
 #include <string>
@@ -49,7 +49,7 @@ void iterativeSimulation(size_t chainIndex, size_t items[], size_t n){
 
 	while (packed < n) {
 		// cout << "Trying to pack " << packed+1 << "." << endl;
-		if (greedy.pack(Bin3(items[i], items[i+1], items[i+2]))) {
+		if (greedy.pack(Item(items[i], items[i+1], items[i+2]))) {
 			packed++;
 			i += 3;
 		}

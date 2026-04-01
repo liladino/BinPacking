@@ -1,0 +1,37 @@
+@startuml
+
+class Bin3{
+    Vec3 position
+    volume() : int
+}
+
+class Vec3
+
+abstract Packer {
+    setLimits()
+    setPolicy()
+    intersects(Bin3 b, Bin3 b) : bool
+    intersectsAny(Bin3 toPack) : bool
+    fitsWithinLimits(Bin3 toPack) : bool
+    volume() : int
+    usedVolume() : int
+    {abstract} pack(Bin3 toPack)
+}
+
+class GreedyPacker {
+    pack(Bin3 toPack)
+}
+
+interface IRotationPolicy {
+    {abstract} rotateBin(Bin3 toPack, Vec3 limits)
+}
+
+class RP_largestFaceUp
+class RP_minLeftoverSlack
+
+Packer <|--GreedyPacker
+Packer *-right- IRotationPolicy
+IRotationPolicy <|-- RP_largestFaceUp
+IRotationPolicy <|-- RP_minLeftoverSlack
+
+@enduml

@@ -12,21 +12,16 @@ class Packer {
 protected:
 	std::vector<Item> packed;
 	Vec3 binSize;
-	std::unique_ptr<IRotationPolicy> rotationPolicy;
 public:
 	/* Sets the limits of the container.
 	 * Automatically sets the order to stand on its larget face.
 	 */
-	void setLimits(size_t x, size_t y, size_t z){ 
+	virtual void setLimits(size_t x, size_t y, size_t z){ 
 		std::vector<size_t> v = {x, y, z}; 
 		std::sort(v.begin(), v.end(), std::greater<size_t>());
 		binSize = {v[0], v[1], v[2]}; 
 	}
 	
-	virtual void setPolicy(std::unique_ptr<IRotationPolicy> rotationPolicy) {
-		this->rotationPolicy = std::move(rotationPolicy);
-	}
-
 	bool intersects(const Item& a, const Item& b) const {
 		for (size_t i = 0; i < 3; ++i) {
 			const bool separated =

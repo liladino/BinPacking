@@ -71,15 +71,12 @@ namespace Shelf2D {
 		size_t pos_y = 0;
 	};
 
-	struct IRotateAlongZ {
-		virtual void rotateAlongZ(Item& item) = 0;
-	};
-
 	class Shelf2DPacker {
 		struct Shelf {
 			size_t x_limit = 0;
 			size_t y_limit = 0;
 			std::vector<Space> spaces = {};
+			size_t _cleanup = 0;
 		};
 		std::vector<Shelf> shelves = {};
 
@@ -87,8 +84,32 @@ namespace Shelf2D {
 		size_t layerHeight = 0;
 		Vec3 binSize;
 		
-		void addFreeSpaceOver(size_t currentShelf, const Item& item){
-			shelves[currentShelf].spaces.push_back({ item.getPos()[0], item.getPos()[0] + item[0], item.getPos()[1] + item[1] });
+		void cleanupFreeSpace(size_t currentShelf) {
+			auto& spaces = shelves[currentShelf].spaces;
+
+			spaces.erase(
+				std::remove_if(spaces.begin(), spaces.end(),
+					[](const Space& s) {
+						return s.x1 >= s.x2;
+					}),
+				spaces.end()
+			);
+
+			std::sort(spaces.begin(), spaces.end(),
+				[](const Space& a, const Space& b) {
+					if (a.pos_y != b.pos_y) return a.pos_y < b.pos_y;
+					return (a.x2 - a.x1) < (b.x2 - b.x1);
+				});
+		}
+
+		void addFreeSpaceOver(size_t currentShelf, const Item& item) {
+			shelves[currentShelf].spaces.push_back({
+				item.getPos()[0],
+				item.getPos()[0] + item[0],
+				item.getPos()[1] + item[1]
+			});
+
+			cleanupFreeSpace(currentShelf); // recommended over counter
 		}
 
 		/* Updates the free space if an item was put there.
@@ -112,11 +133,98 @@ namespace Shelf2D {
 			addFreeSpaceOver(shelf, item);
 		}
 
-	public:
-		Shelf2DPacker(size_t z, Vec3& size) : z(z), binSize(size) {	reset(); }
-		Shelf2DPacker(size_t z) : z(z) { reset(); }
+		Item original, rotated;
+		Item packed;
 
-		void setBinSize(Vec3& size) { 
+		bool tryAndFitIntoFreeSpace(){
+			packed = original;
+			for (size_t i = 0; i < shelves.size(); i++){
+				for (Space& space : shelves[i].spaces) {
+					size_t x = space.x2 - space.x1;
+					size_t y = shelves[i].y_limit - space.pos_y;
+
+					if (original[0] <= x && original[1] <= y) {
+						placeItemInFreeSpace(i, space, original);
+						packed = original;
+						return true;
+					}
+					if (rotated[0] <= x && rotated[1] <= y) {
+						placeItemInFreeSpace(i, space, rotated);
+						packed = rotated;
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+
+		bool tryAndPutIntoEmptyBin(){
+			packed = original;
+			for (int i = 0; i < 2; i++){
+				if (packed[0] <= binSize[0] && packed[1] <= binSize[1] && z + packed[2] <= binSize[2]){
+					shelves.push_back({packed[0], packed[1], {}});
+
+					placeItem(0, 0, 0, packed);
+					return true;
+				}
+				//rotate the item along the z axis to try to fit
+				packed = rotated;
+			}
+			return false; 
+		}
+
+		bool tryAndPutAtEndOfShelves(){ 
+			for (size_t i = 0; i < shelves.size(); i++){
+				size_t x = shelves[i].x_limit, 
+					   y = (i > 0 ? shelves[i-1].y_limit : 0); //set y to be on top of the last shelf
+
+				bool isShelfFlexible = (i == shelves.size()-1);
+
+				packed = original;
+				for (int j = 0; j < 2; j++){
+					if (x + packed[0] <= binSize[0] && y + packed[1] <= binSize[1] && z + packed[2] <= binSize[2]){
+						placeItem(x, y, i, packed);
+						if (isShelfFlexible){
+							shelves[i].y_limit = std::max(y + packed[1], shelves[i].y_limit); //the current shelf depth is not yet fixed, no shelves after
+						}
+						shelves[i].x_limit = x + packed[0];
+						return true;
+					}
+					//rotate the item along the z axis to try to fit
+					packed = rotated;
+				}
+			}
+			return false;
+		}
+
+		bool tryNewShelfAndAdd(){
+			packed = original;
+			size_t lastShelfIndex = shelves.size()-1;
+			if (shelves[lastShelfIndex].x_limit > 0){ //only try if the last shelf was not empty, otherwise wouldn't help to add a shelf
+				size_t y = (lastShelfIndex > 0 ? shelves[lastShelfIndex-1].y_limit : 0);
+
+				for (int i = 0; i < 2; i++){
+					if (packed[0] <= binSize[0] && y + packed[1] <= binSize[1] && z + packed[2] <= binSize[2]){
+						shelves.push_back({packed[0], y + packed[1], {}});
+						placeItem(0, y, lastShelfIndex+1, packed);
+						return true;
+					}
+					//rotate the item along the z axis to try to fit
+					packed = rotated;
+				}
+			}
+			return false;
+		}
+	public:
+		Shelf2DPacker(Vec3 size) : binSize(size) { z = 0; reset(); }
+		Shelf2DPacker(size_t z, Vec3 size) : z(z), binSize(size) { reset(); }
+		Shelf2DPacker() { z = 0; reset(); }
+
+		void setZ(size_t z){
+			this->z = z;
+		}
+
+		void setBinSize(Vec3 size) { 
 			binSize = size; 
 		}
 
@@ -133,89 +241,33 @@ namespace Shelf2D {
 			if (item[0] < item[1]){
 				std::swap(item[0], item[1]);
 			}
-
+			original = rotated = item;
+			std::swap(rotated[0], rotated[1]);
+			
 			//try to fit in free space
-			for (size_t i = 0; i < shelves.size(); i++){
-				for (Space& space : shelves[i].spaces) {
-					size_t x = space.x2 - space.x1;
-					size_t y = shelves[i].y_limit - space.pos_y;
-
-					if (item[0] <= x && item[1] <= y) {
-						placeItemInFreeSpace(i, space, item);
-						return true;
-					}
-
-					//try fit rotated 90deg around z
-					if (item[0] <= y && item[1] <= x) {
-						std::swap(item[0], item[1]);
-						placeItemInFreeSpace(i, space, item);
-						return true;
-					}
-				}
+			if (tryAndFitIntoFreeSpace()){
+				item = packed;
+				return true;
 			}
 
 			// nothing was placed yet
 			if (shelves.size() == 0){
-				size_t itemx = item[0], itemy = item[1];
-				for (int i = 0; i < 2; i++){
-					if (itemx <= binSize[0] && itemy <= binSize[1] && z + item[2] <= binSize[2]){
-						if (i == 1){
-							std::swap(item[0], item[1]);
-						}
-
-						shelves.push_back({item[0], item[1], {}});
-
-						placeItem(0, 0, 0, item);
-						return true;
-					}
-					//rotate the item along the z axis to try to fit
-					std::swap(itemx, itemy);
-				}
-				return false; 
+				bool b = tryAndPutIntoEmptyBin();
+				item = packed;
+				return b;
 			}
 			
 			//try to pack at the end of a shelf
-			for (size_t i = 0; i < shelves.size(); i++){
-				size_t x = shelves[i].x_limit, 
-					   y = (i > 0 ? shelves[i-1].y_limit : 0); //set y to be on top of the last shelf
-
-				bool isShelfFlexible = (i == shelves.size()-1);
-
-				for (int j = 0; j < 2; j++){
-					size_t itemx = item[0], itemy = item[1];
-					if (x + itemx <= binSize[0] && y + itemy <= binSize[1] && z + item[2] <= binSize[2]){
-						if (1 == j) std::swap(item[0], item[1]);
-						placeItem(x, y, i, item);
-						if (isShelfFlexible){
-							shelves[i].y_limit = std::max(y + item[1], shelves[i].y_limit); //the current shelf depth is not yet fixed, no shelves after
-						}
-						shelves[i].x_limit = x + item[0];
-						return true;
-					}
-					//rotate the item along the z axis to try to fit
-					std::swap(itemx, itemy);
-				}
+			if (tryAndPutAtEndOfShelves()){
+				item = packed;
+				return true;
 			}
 
 			//could'nt put it any shelf, try to open a new shelf
-			size_t lastShelfIndex = shelves.size()-1;
-			if (shelves[lastShelfIndex].x_limit > 0){ //only try if the last shelf was not empty, otherwise wouldn't help to add a shelf
-				size_t y = (lastShelfIndex > 0 ? shelves[lastShelfIndex-1].y_limit : 0);
-
-				size_t itemx = item[0], itemy = item[1];
-				for (int i = 0; i < 2; i++){
-					if (itemx <= binSize[0] && y + itemy <= binSize[1] && z + item[2] <= binSize[2]){
-						if (1 == i){
-							std::swap(item[0], item[1]);
-						}
-						shelves.push_back({item[0], y + item[1], {}});
-						placeItem(0, y, lastShelfIndex+1, item);
-						return true;
-					}
-					//rotate the item along the z axis to try to fit
-					std::swap(itemx, itemy);
-				}
-			}
+			if (tryNewShelfAndAdd()){
+				item = packed;
+				return true;
+			}			
 
 			return false;
 		}

@@ -1,5 +1,6 @@
 #include "Item.h"
 #include "GreedyPacker.h"
+#include "ShelfPacker.h"
 #include <iostream>
 #include <string>
 #include <map>
@@ -32,8 +33,7 @@ vector<vector<string>> chains =
 };
 
 int g_policy = 0; 
-
-void iterativeSimulation(size_t chainIndex, size_t items[], size_t n){
+void greedy(size_t chainIndex, size_t items[], size_t n){
 	GreedyPacker greedy;
 	auto& limit = limits[chains[chainIndex][0]];
 	greedy.setLimits(limit[0], limit[1], limit[2]);
@@ -73,6 +73,10 @@ void iterativeSimulation(size_t chainIndex, size_t items[], size_t n){
 	cout << "Ratio: " << ratio*100.0 << "%    (" << ratio << ")" << endl;
 }
 
+void iterativeSimulation(size_t chainIndex, size_t items[], size_t n){
+
+}
+
 int main(){
 	//srand(time(NULL));
 	srand(8);
@@ -84,7 +88,7 @@ int main(){
 	cout << "----------------------------------------------\n";
 	for (g_policy = 0; g_policy < 4; g_policy++){
 		cout << "\nPolicy: " << g_policy << endl;
-		iterativeSimulation(0, items.data(), items.size()/3);
+		greedy(0, items.data(), items.size()/3);
 	}
 
 	return 0;

@@ -6,6 +6,7 @@
 #include <memory>
 
 class GreedyPacker : public Packer {
+	std::unique_ptr<IRotationPolicy> rotationPolicy;
 	struct ComparePOI {
 		bool operator()(const Vec3& a, const Vec3& b) const {
 			if (a[2] != b[2]) return a[2] < b[2]; // z
@@ -31,6 +32,10 @@ public:
 	}
 	GreedyPacker(std::unique_ptr<IRotationPolicy> rotationPolicy) {
 		init();
+		this->rotationPolicy = std::move(rotationPolicy);
+	}
+
+	virtual void setPolicy(std::unique_ptr<IRotationPolicy> rotationPolicy) {
 		this->rotationPolicy = std::move(rotationPolicy);
 	}
 

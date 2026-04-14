@@ -62,7 +62,7 @@ public:
 
 	virtual bool pack(Item toPack) = 0;
 
-    virtual ~Packer() = default;
+	virtual ~Packer() = default;
 };
 
 

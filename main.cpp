@@ -67,7 +67,7 @@ void iterativeSimulation(size_t chainIndex, size_t items[], size_t n){
 		}
 	}
 
-	cout << "\nSuccesfully packed: " << packed << " out of " << n << '.' << endl;	
+	cout << "\nSuccessfully packed: " << packed << " out of " << n << '.' << endl;	
 	cout << "Filled volume: " << (double)greedy.usedVolume() / 1000.0 << " cm^3 out of " << (double)greedy.volume() / 1000.0 << " cm^3" << endl;
 	double ratio = (double)greedy.usedVolume() / (double)greedy.volume();
 	cout << "Ratio: " << ratio*100.0 << "%    (" << ratio << ")" << endl;

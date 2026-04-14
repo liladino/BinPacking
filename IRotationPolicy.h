@@ -25,8 +25,8 @@ struct RP_largestFaceUp : IRotationPolicy {
 
 struct RP_tryFirstFitting : IRotationPolicy {
 	/* Try out the first 5 of the 6 directions, and return the first
-     * which fits within the limits. If none fits, return the 6th 
-     * without check - the caller checks it anyway.
+	 * which fits within the limits. If none fits, return the 6th 
+	 * without check - the caller checks it anyway.
 	 */
 	void rotateBin(Item& toPack, const Vec3& binSize) override {
 		const static Vec3 rotations[] = 
@@ -40,30 +40,30 @@ struct RP_tryFirstFitting : IRotationPolicy {
 			};
 		
 		for (size_t i = 0; i < 5; i++) {
-            bool fits = true;
+			bool fits = true;
 			for (size_t j = 0; j < 3; j++) {
 				size_t src = rotations[i][j];
 				long long dim = toPack[src];
 
 				if (binSize[j] < toPack.getPos(j) + dim) {
-                    fits = false;
-                    break;
-                }
-            }
-            if (fits) {
-                /* all dimensions were good, rotate bin
-                 */
-                auto extent = toPack.extent;
-                toPack[0] = extent[rotations[i][0]];
-                toPack[1] = extent[rotations[i][1]];
-                toPack[2] = extent[rotations[i][2]];
-                return;
-            }
+					fits = false;
+					break;
+				}
+			}
+			if (fits) {
+				/* all dimensions were good, rotate bin
+				 */
+				auto extent = toPack.extent;
+				toPack[0] = extent[rotations[i][0]];
+				toPack[1] = extent[rotations[i][1]];
+				toPack[2] = extent[rotations[i][2]];
+				return;
+			}
 		}
-        /* If no rotation fits, return the 6th, unchecked orientation.
-         * To save computation, the 6th in the order is the original order,
-         * so no job here.
-         */
+		/* If no rotation fits, return the 6th, unchecked orientation.
+		 * To save computation, the 6th in the order is the original order,
+		 * so no job here.
+		 */
 	}
 };
 
@@ -91,7 +91,7 @@ struct RP_minLeftoverSlack : IRotationPolicy {
 			 *     = sum_dimension_k(
 			 *           limit_k - position_k + size_k
 			 *       )
-             * where size_k is the dimension in that dimension (rotation!)
+			 * where size_k is the dimension in that dimension (rotation!)
 			 */
 
 			for (size_t j = 0; j < 3; j++) {

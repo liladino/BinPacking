@@ -1,5 +1,5 @@
-#ifndef BIN_H
-#define BIN_H
+#ifndef ITEM_H
+#define ITEM_H
 
 #include <stdlib.h>
 #include <array>

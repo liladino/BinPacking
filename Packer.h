@@ -23,7 +23,7 @@ public:
 		binSize = {v[0], v[1], v[2]}; 
 	}
 	
-	void setPolicy(std::unique_ptr<IRotationPolicy> rotationPolicy) {
+	virtual void setPolicy(std::unique_ptr<IRotationPolicy> rotationPolicy) {
 		this->rotationPolicy = std::move(rotationPolicy);
 	}
 

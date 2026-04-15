@@ -39,7 +39,7 @@ public:
 		this->rotationPolicy = std::move(rotationPolicy);
 	}
 
-	virtual bool pack(Item toPack) override {
+	virtual bool pack(Item& toPack) override {
 		for (auto it = pointsOfInterest.begin(); it != pointsOfInterest.end(); ++it) {
 			toPack.setPos(*it);
 

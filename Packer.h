@@ -55,7 +55,7 @@ public:
 		return acc;
 	}
 
-	virtual bool pack(Item toPack) = 0;
+	virtual bool pack(Item& toPack) = 0;
 
 	virtual ~Packer() = default;
 };

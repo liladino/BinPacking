@@ -22,7 +22,7 @@ public:
 	}
 
     /* Try to put into the first layer that accepts it */
-	virtual bool pack(Item toPack) override {
+	virtual bool pack(Item& toPack) override {
         rotationPolicy->rotateBin(toPack, binSize);
         currentIndex = currentZ = 0;
         while (currentZ < binSize[2]){
@@ -33,14 +33,24 @@ public:
                 return false;
             }
 
-            if (/* TODO: layer above exist, ceiling = layerAbove && currentZ + toPack[2] <= ceiling*/ true){
+            size_t ceiling = binSize[2];
+            if (currentIndex + 1 < packers2d.size()) {
+                ceiling = packers2d[currentIndex+1].second;
+            }
+
+            //try to fit in the current layer, otherwise move up a layer
+            if (currentZ + toPack[2] <= ceiling){
                 if (packers2d[currentIndex].first.pack(toPack)){
                     packed.push_back(toPack);
                     return true;
                 }
             }
-            currentZ = packers2d[currentIndex].second;
+
+            size_t nextZ = packers2d[currentIndex].second
+                         + packers2d[currentIndex].first.getLayerHeight();
+
             currentIndex++;
+            currentZ = nextZ;
         }
         return false;
 	}

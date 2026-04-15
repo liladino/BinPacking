@@ -22,6 +22,10 @@ public:
 		binSize = {v[0], v[1], v[2]}; 
 	}
 	
+	std::vector<Item>& getPacked(){
+		return packed;
+	}
+
 	bool intersects(const Item& a, const Item& b) const {
 		for (size_t i = 0; i < 3; ++i) {
 			const bool separated =
@@ -56,7 +60,6 @@ public:
 	}
 
 	virtual bool pack(Item& toPack) = 0;
-
 	virtual ~Packer() = default;
 };
 

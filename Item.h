@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <array>
 #include <utility>
+#include <iostream> 
 
 struct Vec3 {
 	std::array<size_t, 3> coords;
@@ -69,5 +70,11 @@ struct Item {
 		return position[index];
 	}
 };
+
+inline std::ostream& operator<<(std::ostream& os, Item item){
+	os << "Item pos: (" << item.getPos()[0] << ", " << item.getPos()[1] << ", " << item.getPos()[2] << "), size: (" 
+						<< item[0] << ", " << item[1] << ", " << item[2] << ")";
+	return os;
+}
 
 #endif

@@ -5,14 +5,7 @@
 #include <string>
 #include <map>
 
-using std::array;
-using std::string;
-using std::vector;
-using std::set;
-using std::map;
-using std::pair;
-using std::cout;
-using std::endl;
+using namespace std;
 
 map<string, Vec3> limits = 
 {
@@ -49,7 +42,8 @@ void greedy(size_t chainIndex, size_t items[], size_t n){
 
 	while (packed < n) {
 		// cout << "Trying to pack " << packed+1 << "." << endl;
-		if (greedy.pack(Item(items[i], items[i+1], items[i+2]))) {
+		Item item(items[i], items[i+1], items[i+2]);
+		if (greedy.pack(item)) {
 			packed++;
 			i += 3;
 		}

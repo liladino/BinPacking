@@ -14,6 +14,7 @@ class ShelfPacker : public Packer {
 		packed = {};
 		binSize = {1, 1, 1};
 		currentZ = 0;
+        packers2d = {};
 	}	
 public:
 	ShelfPacker() {

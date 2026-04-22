@@ -94,11 +94,11 @@ struct ShelfTester{
         std::vector<std::pair<Shelf2D::Shelf2DPacker, size_t>>& packers2d = packer.packers2d;
 
         std::vector<Item> items = 
-            {Item(1,1,1), Item(3,2,1), Item(1,1,1), Item(1,5,1), Item(2,2,2), Item(2,2,1), Item(2,2,1)};
+            {Item(1,1,1), Item(3,2,1), Item(1,1,1), Item(1,5,1), Item(2,2,2), Item(2,2,1), Item(2,2,1), Item(1,1,1)};
         std::vector<Vec3> itemPositions = 
-            {{0,0,0},     {1,0,0},     {0,1,0},     {0,2,0},     {0,0,1},     {2,0,1},     {0,2,1}           };
+            {{0,0,0},     {1,0,0},     {0,1,0},     {0,2,0},     {0,0,1},     {2,0,1},     {0,2,1},     {4, 0, 0}      };
         std::vector<size_t> numOf2dPackers = 
-            {1,           1,           1,           1,           2,           2,           2           };
+            {1,           1,           1,           1,           2,           2,           2,           2 };
         
         for (size_t i = 0; i < items.size(); i++) {
             Item& it = items[i];

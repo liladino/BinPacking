@@ -61,6 +61,8 @@ public:
             p.first.setBinSize({x, y, z});
         }
 	}
+
+	friend struct ::ShelfTester;
 };
 
 

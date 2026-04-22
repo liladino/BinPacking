@@ -10,7 +10,8 @@
 void printItems(const std::vector<Item>& items);
 bool overlap2D(const Item& a, const Item& b) ;
 bool insideBounds2D(const Item& item, const Vec3& bin);
-void assertPosition(const Item& item, size_t x, size_t y);
+void assert2DPosition(const Item& item, size_t x, size_t y);
+void assert3DPosition(const Item& item, size_t x, size_t y, size_t z);
 template<typename T>
 void assertEQ(T exp, T act);
 
@@ -60,6 +61,7 @@ struct ShelfTester{
     // }
     
     void testExample1() {
+        std::cout << "\nTest 1\n";
         Shelf2D::Shelf2DPacker packer({10, 10, 10});
 
         Item a(1,1,1);
@@ -67,13 +69,13 @@ struct ShelfTester{
         Item c(1,2,1);
 
         packer.pack(a);
-        assertPosition(a, 0, 0);
+        assert2DPosition(a, 0, 0);
 
         packer.pack(b);
-        assertPosition(b, 1, 0);
+        assert2DPosition(b, 1, 0);
 
         packer.pack(c);
-        assertPosition(c, 0, 1);
+        assert2DPosition(c, 0, 1);
 
 		assertEQ((size_t)1, packer.getLayerHeight());
 
@@ -83,6 +85,43 @@ struct ShelfTester{
 		else {
 			std::cout << "Valid packing.\n";
 		}
+    }
+
+    void testExample2() {
+        std::cout << "\nTest 2\n";
+        ShelfPacker packer;
+        packer.setLimits(5, 4, 4);
+        std::vector<std::pair<Shelf2D::Shelf2DPacker, size_t>>& packers2d = packer.packers2d;
+
+        std::vector<Item> items = 
+            {Item(1,1,1), Item(3,2,1), Item(1,1,1), Item(1,5,1), Item(2,2,2), Item(2,2,1), Item(2,2,1)};
+        std::vector<Vec3> itemPositions = 
+            {{0,0,0},     {1,0,0},     {0,1,0},     {0,2,0},     {0,0,1},     {2,0,1},     {0,2,1}           };
+        std::vector<size_t> numOf2dPackers = 
+            {1,           1,           1,           1,           2,           2,           2           };
+        
+        for (size_t i = 0; i < items.size(); i++) {
+            Item& it = items[i];
+            packer.pack(it);
+            assert3DPosition(it, itemPositions[i][0], itemPositions[i][1], itemPositions[i][2]);
+            assertEQ(numOf2dPackers[i], packers2d.size());
+        }
+        
+        //layer start z
+		assertEQ((size_t)0, packers2d[0].second);
+		assertEQ((size_t)1, packers2d[1].second);
+		//layer height z
+        assertEQ((size_t)1, packers2d[0].first.getLayerHeight());
+		assertEQ((size_t)2, packers2d[1].first.getLayerHeight());
+
+        for (auto& [p, s] : packers2d){
+            if (!validatePacking(p, packer.binSize)) {
+                std::cout << "Validation failed!\n";
+            }
+            else {
+                std::cout << "Valid packing.\n";
+            }
+        }
     }
 };
 

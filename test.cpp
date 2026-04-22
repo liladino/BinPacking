@@ -20,12 +20,24 @@ bool insideBounds2D(const Item& item, const Vec3& bin) {
         item.getPos(1) + item[1] <= bin[1];
 }
 
-void assertPosition(const Item& item, size_t x, size_t y) {
+void assert2DPosition(const Item& item, size_t x, size_t y) {
     if (item.getPos(0) != x || item.getPos(1) != y) {
         cout << "Wrong placement! Expected (" 
                 << x << "," << y << ") got ("
                 << item.getPos(0) << "," 
                 << item.getPos(1) << ")\n";
+        return;
+    }
+    cout << "Assert success" << endl;
+}
+
+void assert3DPosition(const Item& item, size_t x, size_t y, size_t z) {
+    if (item.getPos(0) != x || item.getPos(1) != y || item.getPos(2) != z) {
+        cout << "Wrong placement! Expected (" 
+                << x << ", " << y << ", " << z << ") got ("
+                << item.getPos(0) << ", " 
+                << item.getPos(1) << ", " 
+                << item.getPos(2) << ")\n";
         return;
     }
     cout << "Assert success" << endl;
@@ -42,4 +54,5 @@ void assertEQ(T exp, T act){
 int main(){
     ShelfTester test;
     test.testExample1();
+    test.testExample2();
 }

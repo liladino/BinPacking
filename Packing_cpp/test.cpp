@@ -53,6 +53,7 @@ void assertEQ(T exp, T act){
 
 int main(){
     ShelfTester test;
-    test.testExample1();
-    test.testExample2();
+    test.randomTest_fix();
+    // test.testExample1();
+    // test.testExample2();
 }

@@ -4,7 +4,11 @@
 #include "Shelf2D.h"
 #include "ShelfPacker.h"
 #include "Item.h"
+#include "export.h"
 #include <iostream>
+#include <chrono>
+#include <thread>
+
 
 
 void printItems(const std::vector<Item>& items);
@@ -16,7 +20,7 @@ template<typename T>
 void assertEQ(T exp, T act);
 
 struct ShelfTester{ 
-    bool validatePacking(Shelf2D::Shelf2DPacker& packer, const Vec3& bin) {
+    static bool validatePacking(Shelf2D::Shelf2DPacker& packer, const Vec3& bin) {
         auto& items = packer.placed;
 
         // 1. Bounds check
@@ -40,25 +44,54 @@ struct ShelfTester{
         return true;
     }
 
-    // void randomTest() {
-    //     Shelf2D::Shelf2DPacker packer({100, 100, 100});
+    void randomTest() {
+        int start = 1;
+        for (int j = start; j < start + 100; j++){
+            ShelfPacker packer;
+            packer.setLimits(30, 30, 30);
+            std::vector<std::pair<Shelf2D::Shelf2DPacker, size_t>>& packers2d = packer.packers2d;
+            srand(j);
 
-    //     std::vector<Item> items;
+            for (int i = 0; i < 100; i++) {
+                Item it(rand()%20 + 1, rand()%20 + 1, rand()%20 + 1);
 
-    //     for (int i = 0; i < 100; i++) {
-    //         Item it(rand()%20 + 1, rand()%20 + 1, 1);
+                packer.pack(it);
+                for (auto& [p, s] : packers2d){
+                    if (!validatePacking(p, packer.binSize)) {
+                        std::cout << "Validation failed! seed: " << j <<"\n";
+                        return;
+                    }
+                    else {
+                        std::cout << "Valid packing.\n";
+                    }
+                }
+            }
+        }
+    }
 
-    //         if (packer.pack(it)) {
-    //             items.push_back(it);
-    //         }
-    //     }
+    void randomTest_fix() {
+        ShelfPacker packer;
+        packer.setLimits(30, 30, 7);
+        std::vector<std::pair<Shelf2D::Shelf2DPacker, size_t>>& packers2d = packer.packers2d;
+        srand(1);
 
-    //     if (!validatePacking(packer, {100,100,100})) {
-    //         cout << "Random test failed!\n";
-    //     } else {
-    //         cout << "Random test OK\n";
-    //     }
-    // }
+        for (int i = 0; i < 100; i++) {
+            Item it(rand()%20 + 1, rand()%20 + 1, rand()%20 + 1);
+            packer.pack(it);
+            exportJSON(&packer);
+    		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+            for (auto& [p, s] : packers2d){
+                if (!validatePacking(p, packer.binSize)) {
+                    return;
+                }
+                else {
+                    std::cout << "Valid packing.\n";
+                }
+            }
+        
+        }
+    }
     
     void testExample1() {
         std::cout << "\nTest 1\n";

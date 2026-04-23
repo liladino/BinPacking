@@ -171,14 +171,20 @@ namespace Shelf2D {
 
 				packed = original;
 				for (int j = 0; j < 2; j++){
-					if (x + packed[0] <= binSize[0] && y + packed[1] <= binSize[1] && z + packed[2] <= binSize[2]){
+					
+					if (isShelfFlexible && x + packed[0] <= binSize[0] && y + packed[1] <= binSize[1] && z + packed[2] <= binSize[2]){
 						placeItem(x, y, i, packed);
-						if (isShelfFlexible){
-							shelves[i].height = std::max(packed[1], shelves[i].height); //the current shelf depth is not yet fixed, no shelves after
-						}
+						shelves[i].height = std::max(packed[1], shelves[i].height); //the current shelf depth is not yet fixed, no shelves after
 						shelves[i].x_limit = x + packed[0];
 						return true;
 					}
+
+					if (!isShelfFlexible && x + packed[0] <= binSize[0] && packed[1] <= shelves[i].height && z + packed[2] <= binSize[2]){
+						placeItem(x, y, i, packed);
+						shelves[i].x_limit = x + packed[0];
+						return true;
+					}
+					
 					//rotate the item along the z axis to try to fit
 					packed = rotated;
 				}

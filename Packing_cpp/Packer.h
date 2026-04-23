@@ -17,11 +17,17 @@ public:
 	 * Automatically sets the order to stand on its larget face.
 	 */
 	virtual void setLimits(size_t x, size_t y, size_t z){ 
+		// std::cout << "Old: " << binSize[0] << ' ' << binSize[1] << ' ' << binSize[2] << '\n';
 		std::vector<size_t> v = {x, y, z}; 
 		std::sort(v.begin(), v.end(), std::greater<size_t>());
 		binSize = {v[0], v[1], v[2]}; 
+		// std::cout << "New: " << v[0] << ' ' << v[1] << ' ' << v[2] << std::endl;
 	}
 	
+	Vec3 getLimits() {
+		return binSize;
+	}
+
 	std::vector<Item>& getPacked(){
 		return packed;
 	}

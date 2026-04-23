@@ -29,7 +29,7 @@ const camera = new THREE.PerspectiveCamera(
     75,
     window.innerWidth / window.innerHeight,
     0.1,
-    1000
+    3000
 );
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -47,37 +47,32 @@ scene.add(light);
 scene.add(new THREE.AmbientLight(0x404040));
 
 // ------------------------
-// BIN (edges only)
+// Load bin and items
 // ------------------------
-const bin = { w: 10, h: 10, d: 10 };
-const padding = 0.01; // Even a tiny amount prevents the flicker
+const padding = 0.01; 
+async function loadBinData(url) {
+    const response = await fetch(url);
+    const data = await response.json();
 
-// Create geometry slightly larger than the logical bin
-const binGeometry = new THREE.BoxGeometry(
-    bin.w + padding, 
-    bin.h + padding, 
-    bin.d + padding
-);
+    const binGeom = new THREE.BoxGeometry(data.bin.w + padding, data.bin.h+ padding, data.bin.d + padding);
+    const binLines = new THREE.LineSegments(
+        new THREE.EdgesGeometry(binGeom),
+        new THREE.LineBasicMaterial({ color: 0x000000 })
+    );
+    binLines.position.set(data.bin.w/2, data.bin.h/2, data.bin.d/2);
+    scene.add(binLines);
 
-// const binGeometry = new THREE.BoxGeometry(bin.w, bin.h, bin.d);
-const edges = new THREE.EdgesGeometry(binGeometry);
-const binLines = new THREE.LineSegments(
-    edges,
-    new THREE.LineBasicMaterial({ color: 0x000000 })
-);
+    data.items.forEach(item => {
+        addBox(item);
+    });
 
-// Position the bin wireframe so (0,0,0) is the bottom-left-front corner
-binLines.position.set(bin.w / 2, bin.h / 2, bin.d / 2);
-scene.add(binLines);
+    // Camera
+    controls.target.set(data.bin.w/2, data.bin.h/2, data.bin.d/2); 
+    camera.position.set(1.5 * data.bin.w, 1.5 * data.bin.h, 1.5 * data.bin.d);
+    // camera.position.set(0 * data.bin.w, 0 * data.bin.h, 5 * data.bin.d);
+}
 
-// ------------------------
-// BOXES
-// ------------------------
-const boxes = [
-    { x: 0, y: 0, z: 0, w: 4, h: 4, d: 4 },
-    { x: 4, y: 0, z: 0, w: 3, h: 5, d: 2 },
-    { x: 0, y: 4, z: 0, w: 2, h: 3, d: 6 },
-];
+loadBinData('data.json');
 
 function addBox(b) {
 	const geometry = new THREE.BoxGeometry(
@@ -114,14 +109,6 @@ function addBox(b) {
 
     scene.add(group);
 }
-
-boxes.forEach(addBox);
-
-// ------------------------
-// CAMERA & ANIMATION
-// ------------------------
-camera.position.set(15, 15, 15);
-controls.target.set(bin.w / 2, bin.h / 2, bin.d / 2);
 
 function animate() {
     requestAnimationFrame(animate);

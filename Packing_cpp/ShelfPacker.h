@@ -26,6 +26,10 @@ public:
 	virtual bool pack(Item& toPack) override {
         rotationPolicy->rotateBin(toPack, binSize);
         currentIndex = currentZ = 0;
+        if (!fitsWithinLimits(toPack)){
+            return false;
+        }
+
         while (currentZ < binSize[2]){
             if (packers2d.size() <= currentIndex) {
                 packers2d.push_back({Shelf2D::Shelf2DPacker(currentZ, binSize), currentZ});

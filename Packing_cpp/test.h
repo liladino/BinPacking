@@ -4,12 +4,11 @@
 #include "Shelf2D.h"
 #include "ShelfPacker.h"
 #include "Item.h"
-#include "export.h"
+#include "io.h"
+#include "simulation.h"
 #include <iostream>
 #include <chrono>
 #include <thread>
-
-
 
 void printItems(const std::vector<Item>& items);
 bool overlap2D(const Item& a, const Item& b) ;
@@ -78,7 +77,7 @@ struct ShelfTester{
         for (int i = 0; i < 100; i++) {
             Item it(rand()%20 + 1, rand()%20 + 1, rand()%20 + 1);
             packer.pack(it);
-            exportJSON(&packer);
+            exportPackingToJSON(&packer, "../data.json");
     		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
             for (auto& [p, s] : packers2d){

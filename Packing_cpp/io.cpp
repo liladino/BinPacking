@@ -1,10 +1,4 @@
-#ifndef EXPORT_H
-#define EXPORT_H
-
-#include "Packer.h"
-#include <string>
-#include <sstream>
-#include <fstream>
+#include "io.h"
 
 std::string jsonData(std::string name, size_t val){
 	std::stringstream ss;
@@ -12,7 +6,7 @@ std::string jsonData(std::string name, size_t val){
 	return ss.str();
 }
 
-void exportJSON(Packer* packer){
+void exportPackingToJSON(Packer* packer, std::string outfile){
 	/* Format:
 	{
 		"bin": { "w": 15, "h": 9, "d": 8 },
@@ -23,7 +17,7 @@ void exportJSON(Packer* packer){
 		]
 	}
 	*/
-	std::ofstream data("../data.json");
+	std::ofstream data(outfile);
 	std::stringstream ss;
 	ss << "{\n\t\"bin\": { " << jsonData("w", packer->getLimits()[0]) << ", " << jsonData("h", packer->getLimits()[1]) << ", " << jsonData("d", packer->getLimits()[2]) << " },\n";
 	ss << "\t\"items\": [\n";
@@ -46,5 +40,3 @@ void exportJSON(Packer* packer){
 	// cout << s;
 }
 
-
-#endif

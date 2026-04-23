@@ -51,9 +51,44 @@ void assertEQ(T exp, T act){
     cout << "Assert success" << endl;
 }
 
+bool vecComp2(const Vec3& a, const Vec3& b) {
+	if (a[2] != b[2]) return a[2] < b[2]; // z
+	if (a[1] != b[1]) return a[1] < b[1]; // y
+	return a[0] < b[0];                   // x
+}
+
+bool vecComp(const Vec3& a, const Vec3& b) {
+	return a[0] * a[1] * a[2] < b[0] * b[1] * b[2];
+}
+
 int main(){
     ShelfTester test;
-    test.randomTest_fix();
-    // test.testExample1();
-    // test.testExample2();
+    // test.randomTest_fix();
+    test.testExample1();
+    test.testExample2();
+
+    srand(time(NULL));  
+	// srand(8);
+	vector<Vec3> itemVec;
+	vector<size_t> items;
+	for (int i = 1; i <= 100; i++){
+		itemVec.push_back({(size_t)(rand() % 120 + 50), (size_t)(rand() % 120 + 50), (size_t)(rand() % 120 + 50)});
+	}
+	sort(itemVec.rbegin(), itemVec.rend(), vecComp);
+	for (auto& x : itemVec){
+		items.push_back(x[0]);
+		items.push_back(x[1]);
+		items.push_back(x[2]);
+	}
+
+
+	cout << "----------------------------------------------\n";
+	for (int policy = 0; policy < 4; policy++){
+		cout << "\nPolicy: " << policy << endl;
+		greedy(0, items.data(), items.size()/3, policy, "../data.json");
+	}
+
+	cout << "----------------------------------------------\n";
+	ShelfPacker s;
+	simul(&s, 0, items.data(), items.size()/3, "../data.json");
 }

@@ -44,7 +44,7 @@ test
 *.idb
 *.pdb
 gmon.out
-report.txt
+*.txt
 
 # Kernel Module Compile Results
 *.mod*

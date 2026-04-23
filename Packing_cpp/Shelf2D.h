@@ -223,6 +223,7 @@ namespace Shelf2D {
 		
 		void reset() {
 			shelves = {};
+			placed = {};
 			layerHeight = 0;
 		}
 

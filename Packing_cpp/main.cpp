@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 
-	string infile = "", outfile = "data.json";
+	string infile = "", outfile = "../data.json";
 	int alg = 0;
 	Command lastComm = Command::Other; 
 	for (int i = 1; i < argc; i++){
@@ -41,18 +41,27 @@ int main(int argc, char *argv[]) {
 			lastComm = Command::Other;
 		}
 	}
+	if (infile == ""){
+		return 0;
+	}
 
-	// switch (alg){
-	// 	case 4: 
-	// 		{
-	// 			ShelfPacker s;
-	// 			simul(&s, 0, items.data(), items.size()/3, "../data.json");
-	// 		}
-	// 		break;
-	// 	default:
-	// 		greedy(0, items.data(), items.size()/3, policy, "../data.json");
-	// 		break;
-	// }
+	std::vector<size_t> itemsVec;
+	size_t items = importItems(infile, itemsVec); 
+	if (items == 0){
+		return 0;
+	}
+
+	switch (alg){
+		case 4: 
+			{
+				ShelfPacker s;
+				simul(&s, 0, itemsVec.data(), items, "../data.json");
+			}
+			break;
+		default:
+			greedy(0, itemsVec.data(), items, alg, "../data.json");
+			break;
+	}
 
 	return 0;
 }

@@ -18,6 +18,10 @@ void exportPackingToJSON(Packer* packer, std::string outfile){
 	}
 	*/
 	std::ofstream data(outfile);
+	if (!data.is_open()){
+		std::cerr << "Couldn't open file " << outfile << std::endl;
+		return;
+	}
 	std::stringstream ss;
 	ss << "{\n\t\"bin\": { " << jsonData("w", packer->getLimits()[0]) << ", " << jsonData("h", packer->getLimits()[1]) << ", " << jsonData("d", packer->getLimits()[2]) << " },\n";
 	ss << "\t\"items\": [\n";
@@ -40,3 +44,19 @@ void exportPackingToJSON(Packer* packer, std::string outfile){
 	// cout << s;
 }
 
+size_t importItems(const std::string& infile, std::vector<size_t>& items){
+	std::ifstream data(infile);
+	if (!data.is_open()){
+		std::cerr << "Couldn't open file " << infile << std::endl;
+		return 0;
+	}
+	size_t x;
+	while (data >> x){
+		items.push_back(x);
+	}
+
+	while (items.size() % 3 != 0) {
+		items.pop_back();
+	}
+	return items.size()/3;
+}

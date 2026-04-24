@@ -8,5 +8,6 @@
 
 std::string jsonData(std::string name, size_t val);
 void exportPackingToJSON(Packer* packer, std::string outfile);
+size_t importItems(const std::string& infile, std::vector<size_t>& items);
 
 #endif

@@ -50,13 +50,13 @@ void simul(Packer* packer, size_t chainIndex, size_t items[], size_t n, string o
 			}
 		}
 	}
-	exportPackingToJSON(packer, outfile);
-	this_thread::sleep_for(chrono::milliseconds(1000));
 
 	cout << "\nSuccessfully packed: " << succ << " out of " << n << '.' << endl;	
 	cout << "Filled volume: " << (double)packer->usedVolume() / 1000.0 << " cm^3 out of " << (double)packer->volume() / 1000.0 << " cm^3" << endl;
 	double ratio = (double)packer->usedVolume() / (double)packer->volume();
 	cout << "Ratio: " << ratio*100.0 << "%    (" << ratio << ")" << endl;
+	
+	exportPackingToJSON(packer, outfile);
 }
 
 void greedy(size_t chainIndex, size_t items[], size_t n, int policy, std::string outfile){

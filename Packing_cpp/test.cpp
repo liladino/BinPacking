@@ -81,11 +81,14 @@ int main(){
 		items.push_back(x[2]);
 	}
 
-
+    char c;
+    noskipws(cin);
 	cout << "----------------------------------------------\n";
 	for (int policy = 0; policy < 4; policy++){
 		cout << "\nPolicy: " << policy << endl;
 		greedy(0, items.data(), items.size()/3, policy, "../data.json");
+    	// this_thread::sleep_for(chrono::milliseconds(1000));
+        cin >> c;
 	}
 
 	cout << "----------------------------------------------\n";

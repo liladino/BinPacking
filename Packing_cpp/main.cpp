@@ -10,6 +10,8 @@ enum class Command{
 	Other
 };
 
+
+// g++ main.cpp simulation.cpp io.cpp -Wall
 int main(int argc, char *argv[]) {
 	if (argc < 2){
 		return 0;

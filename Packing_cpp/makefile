@@ -14,5 +14,8 @@ FLAGS = -Wall -O3
 test: test.o
 	$(CC) $(FLAGS) test.o -o $@ 
 
+all:
+	$(CC) $(FLAGS) main.cpp simulation.cpp io.cpp
+
 clean:
 	rm *.o

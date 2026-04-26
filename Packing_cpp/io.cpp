@@ -34,7 +34,7 @@ void exportPackingToJSON(Packer* packer, const std::string& outfile){
 	ss << "\t\"items\": [\n";
 
 	auto items = packer->getPackedList();
-	for (int i = 0; i < items.size(); i++){
+	for (size_t i = 0; i < items.size(); i++){
 		auto& x = items[i];
 		ss << "\t\t{ " << jsonData("x", x.getPos()[0]) << ", " << jsonData("y", x.getPos()[1]) << ", " << jsonData("z", x.getPos()[2]) << ", " << jsonData("w", x[0]) << ", " << jsonData("h", x[1]) << ", " << jsonData("d", x[2]); 
 		if (i < items.size()-1){

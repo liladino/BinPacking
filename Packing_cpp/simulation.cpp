@@ -1,8 +1,6 @@
 #include "simulation.h"
 
-using namespace std;
-
-map<string, Vec3> limits = 
+std::map<std::string, Vec3> limits = 
 {
 	{"test1", {10, 10, 10}},
 	{"test2", {12, 10, 12}},
@@ -13,63 +11,70 @@ map<string, Vec3> limits =
 	{"xl", {600, 500, 320}}
 };
 
-vector<vector<string>> chains = 
+std::vector<std::vector<std::string>> chains = 
 {
 	// {"test1", "test2"},
 	{"xs", "m", "l", "xl"},
 	{"s",  "m", "l", "xl"}
 };
 
-void simul(Packer* packer, size_t chainIndex, size_t items[], size_t n, string outfile){
-	auto limit = limits[chains[chainIndex][0]];
-	packer->setLimits(limit[0], limit[1], limit[2]);
+void simul(Packer* packer, size_t items[], size_t n, const std::string& outfile){
+	// for (size_t chainIndex = 0; chainIndex < chains.size(); chainIndex++){
+	size_t chainIndex = 0;
+		packer->clear();
 
-	size_t chain_j = 0, i = 0, packed = 0, succ = 0;
+		auto limit = limits[chains[chainIndex][0]];
+		packer->setLimits(limit[0], limit[1], limit[2]);
 
-	while (packed < n) {
-		// cout << "Trying to pack " << packed+1 << "." << endl;
-		Item item(items[i], items[i+1], items[i+2]);
+		size_t chain_j = 0, i = 0, itemID = 0, succ = 0;
 
-		if (packer->pack(item)) {
-			packed++;
-			succ++;
-			i += 3;
-		}
-		else {
-			if (chain_j+1 < chains[chainIndex].size()){
-				chain_j++;
-				limit = limits[chains[chainIndex][chain_j]];
-				packer->setLimits(limit[0], limit[1], limit[2]);
-				cout << "at " << packed+1 << ". resized to " << chains[chainIndex][chain_j] << " bin." << endl;
-			}
-			else{
-				// cout << "Couldn't fit " << packed+1 << ". Skipped." << endl;
-				packed++;
+		while (itemID < n) {
+			// cout << "Trying to pack " << itemID+1 << "." << endl;
+			Item item(items[i], items[i+1], items[i+2], itemID);
+
+			if (packer->pack(item)) {
+				itemID++;
+				succ++;
 				i += 3;
-				// break;
+			}
+			else {
+				if (chain_j+1 < chains[chainIndex].size()){
+					chain_j++;
+					limit = limits[chains[chainIndex][chain_j]];
+					packer->setLimits(limit[0], limit[1], limit[2]);
+					// std::cout << "at " << itemID+1 << ". resized to " << chains[chainIndex][chain_j] << " bin." << std::endl;
+				}
+				else{
+					//item couldnt be fit into biggest bin, skip
+					itemID++;
+					i += 3;
+					// break;
+				}
 			}
 		}
-	}
 
-	cout << "\nSuccessfully packed: " << succ << " out of " << n << '.' << endl;	
-	cout << "Filled volume: " << (double)packer->usedVolume() / 1000.0 << " cm^3 out of " << (double)packer->volume() / 1000.0 << " cm^3" << endl;
-	double ratio = (double)packer->usedVolume() / (double)packer->volume();
-	cout << "Ratio: " << ratio*100.0 << "%    (" << ratio << ")" << endl;
-	
-	exportPackingToJSON(packer, outfile);
+		exportPackingToJSON(packer, "../data.json");
+		std::cout << metaDataToJSON(chains[chainIndex][chain_j], n, packer) << std::endl;
+	// }
 }
 
 void greedy(size_t chainIndex, size_t items[], size_t n, int policy, std::string outfile){
-	GreedyPacker greedy;
-	auto limit = limits[chains[chainIndex][0]];
-	greedy.setLimits(limit[0], limit[1], limit[2]);
+	
+}
 
-	switch (policy){
-		case 1: greedy.setPolicy(std::make_unique<RP_largestFaceUp>()); break;
-		case 2: greedy.setPolicy(std::make_unique<RP_minLeftoverSlack>()); break;
-		case 3: greedy.setPolicy(std::make_unique<RP_tryFirstFitting>()); break;
-		default: break;
+void simulate(size_t algorithm, size_t items[], size_t n, const std::string& outfile){
+	if (algorithm < 4){
+		GreedyPacker greedy;
+		switch (algorithm){
+			case 1: greedy.setPolicy(std::make_unique<RP_largestFaceUp>()); break;
+			case 2: greedy.setPolicy(std::make_unique<RP_minLeftoverSlack>()); break;
+			case 3: greedy.setPolicy(std::make_unique<RP_tryFirstFitting>()); break;
+			default: break;
+		}
+		simul(&greedy, items, n, outfile);
 	}
-
-	simul(&greedy, chainIndex, items, n, outfile);
+	else if (algorithm == 4){
+		ShelfPacker s;
+		simul(&s, items, n, outfile);
+	}
 }

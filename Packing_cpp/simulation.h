@@ -13,7 +13,7 @@
 #include <sstream>
 
 
-void simul(Packer* packer, size_t chainIndex, size_t items[], size_t n, std::string outfile);
+void simulate(size_t algorithm, size_t items[], size_t n, const std::string& outfile);
 void greedy(size_t chainIndex, size_t items[], size_t n, int policy, std::string outfile);
 
 #endif

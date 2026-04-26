@@ -23,13 +23,21 @@ public:
 		binSize = {v[0], v[1], v[2]}; 
 		// std::cout << "New: " << v[0] << ' ' << v[1] << ' ' << v[2] << std::endl;
 	}
+
+	virtual void clear(){
+		packed = {};
+	}
 	
 	Vec3 getLimits() {
 		return binSize;
 	}
 
-	std::vector<Item>& getPacked(){
+	std::vector<Item>& getPackedList(){
 		return packed;
+	}
+
+	size_t getPacked(){
+		return packed.size();
 	}
 
 	bool intersects(const Item& a, const Item& b) const {

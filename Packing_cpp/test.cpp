@@ -61,6 +61,7 @@ bool vecComp(const Vec3& a, const Vec3& b) {
 	return a[0] * a[1] * a[2] < b[0] * b[1] * b[2];
 }
 
+// g++ test.cpp io.cpp simulation.cpp
 int main(){
     ShelfTester test;
     // test.randomTest_fix();
@@ -93,5 +94,5 @@ int main(){
 
 	cout << "----------------------------------------------\n";
 	ShelfPacker s;
-	simul(&s, 0, items.data(), items.size()/3, "../data.json");
+	// simul(&s, 0, items.data(), items.size()/3, "../data.json");
 }

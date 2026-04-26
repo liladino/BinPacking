@@ -34,6 +34,10 @@ public:
 		init();
 		this->rotationPolicy = std::move(rotationPolicy);
 	}
+	
+    void clear() override {
+        init();
+    }
 
 	virtual void setPolicy(std::unique_ptr<IRotationPolicy> rotationPolicy) {
 		this->rotationPolicy = std::move(rotationPolicy);

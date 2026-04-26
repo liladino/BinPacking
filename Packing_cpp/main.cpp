@@ -51,17 +51,7 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 
-	switch (alg){
-		case 4: 
-			{
-				ShelfPacker s;
-				simul(&s, 0, itemsVec.data(), items, "../data.json");
-			}
-			break;
-		default:
-			greedy(0, itemsVec.data(), items, alg, "../data.json");
-			break;
-	}
-
+	simulate(alg, itemsVec.data(), items, "dump.txt");
+		
 	return 0;
 }

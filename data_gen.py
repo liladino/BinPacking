@@ -70,4 +70,4 @@ def generate_dataset(n_items):
 df = generate_dataset(N_ITEMS)
 
 df.to_csv(OUTPUT_FILE, index=False)
-print(f"Generated {len(df)} items → {OUTPUT_FILE}")
+print(f"Generated {len(df)} items -> {OUTPUT_FILE}")

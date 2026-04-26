@@ -32,12 +32,17 @@ struct Vec3 {
 struct Item {
 	std::array<size_t, 3> extent;
 	Vec3 position;
+	int ID;
 
 	Item(){ 
 		extent = {0, 0, 0};
 	}
 	Item(size_t x, size_t y, size_t z){ 
 		extent = {x, y, z};
+	}
+	Item(size_t x, size_t y, size_t z, int id){ 
+		extent = {x, y, z};
+		ID = id;
 	}
 
 	void setPos(const Vec3& p){
@@ -73,7 +78,7 @@ struct Item {
 
 inline std::ostream& operator<<(std::ostream& os, Item item){
 	os << "Item pos: (" << item.getPos()[0] << ", " << item.getPos()[1] << ", " << item.getPos()[2] << "), size: (" 
-						<< item[0] << ", " << item[1] << ", " << item[2] << ")";
+						<< item[0] << ", " << item[1] << ", " << item[2] << "), ID: " << item.ID;
 	return os;
 }
 

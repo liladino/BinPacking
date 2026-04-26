@@ -22,6 +22,10 @@ public:
 		init();
 	}
 
+    void clear() override {
+        init();
+    }
+
     /* Try to put into the first layer that accepts it */
 	virtual bool pack(Item& toPack) override {
         rotationPolicy->rotateBin(toPack, binSize);

@@ -14,6 +14,8 @@ std::string jsonData<const std::string&>(const std::string& name, const std::str
 
 void exportPackingToJSON(Packer* packer, const std::string& outfile);
 std::string metaDataToJSON(const std::string& neededBin, size_t allItems, Packer* packer);
+void writeMetaData(const std::string& outfile, const std::string& data);
+
 size_t importItems(const std::string& infile, std::vector<size_t>& items);
 
 #endif

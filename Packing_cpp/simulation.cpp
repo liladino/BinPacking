@@ -18,9 +18,16 @@ std::vector<std::vector<std::string>> chains =
 	{"s",  "m", "l", "xl"}
 };
 
+
+template <typename T1, typename T2, typename T3> 
+struct trio{
+	T1 first; T2 second; T3 third;
+};
+
 void simul(Packer* packer, size_t items[], size_t n, const std::string& outfile){
-	// for (size_t chainIndex = 0; chainIndex < chains.size(); chainIndex++){
-	size_t chainIndex = 0;
+	const std::string visualFileName = "../data", visualFileType = ".json";
+	std::vector<trio<size_t, size_t, std::string>> results;
+	for (size_t chainIndex = 0; chainIndex < chains.size(); chainIndex++){
 		packer->clear();
 
 		auto limit = limits[chains[chainIndex][0]];
@@ -54,8 +61,30 @@ void simul(Packer* packer, size_t items[], size_t n, const std::string& outfile)
 		}
 
 		exportPackingToJSON(packer, "../data.json");
-		std::cout << metaDataToJSON(chains[chainIndex][chain_j], n, packer) << std::endl;
-	// }
+		// exportPackingToJSON(packer, visualFileName + std::to_string(chainIndex) + visualFileType);
+
+		// char c; std::noskipws(std::cin); std::cin >> c;
+
+		auto meta = metaDataToJSON(chains[chainIndex][chain_j], n, packer);
+		// std::cout << meta << std::endl;
+		results.push_back({packer->getPacked(), chain_j, meta});
+	}
+
+	int maxi = 0;
+	for (size_t i = 1; i < chains.size(); i++){
+		if (results[i].first > results[maxi].first){
+			// packed more?
+			maxi = i;
+		}
+		else if (results[i].first == results[maxi].first){
+			// used a smaller bin?
+			if (results[i].second < results[maxi].second){
+				maxi = i;
+			}
+		}
+	}
+	
+	writeMetaData(outfile, results[maxi].third);
 }
 
 void greedy(size_t chainIndex, size_t items[], size_t n, int policy, std::string outfile){

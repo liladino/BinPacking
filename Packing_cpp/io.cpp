@@ -49,6 +49,8 @@ void exportPackingToJSON(Packer* packer, const std::string& outfile){
 	std::string s = ss.str();
 	data << s;
 	// cout << s;
+
+	data.close();
 }
 
 size_t importItems(const std::string& infile, std::vector<size_t>& items){
@@ -70,6 +72,8 @@ size_t importItems(const std::string& infile, std::vector<size_t>& items){
 	// 	std::cout << x << " ";
 	// }
 	// std::cout << std::endl;
+
+	data.close();
 	return items.size()/3;
 }
 
@@ -82,12 +86,6 @@ std::string metaDataToJSON(const std::string& neededBin, size_t allItems, Packer
 		"packed_items": [0, 1, 3, 4]
 	}
 	*/
-	// std::ofstream data(outfile);
-	// if (!data.is_open()){
-	// 	std::cerr << "Couldn't open file " << outfile << std::endl;
-	// 	return;
-	// }
-
 	std::stringstream ss;
 	ss << "{\n\t" << jsonData("bin_needed", neededBin) << ",\n";
 	ss << "\t" << jsonData("all_items", allItems) << ",\n";
@@ -103,4 +101,15 @@ std::string metaDataToJSON(const std::string& neededBin, size_t allItems, Packer
 	ss << "}";
 	
 	return ss.str();
+}
+
+
+void writeMetaData(const std::string& outfile, const std::string& data){
+	std::ofstream f(outfile);
+	if (!f.is_open()){
+		std::cerr << "Couldn't open file " << outfile << std::endl;
+		return;
+	}
+	f << data;
+	f.close();
 }

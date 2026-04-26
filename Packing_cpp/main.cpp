@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 
-	string infile = "", outfile = "../data.json";
+	string infile = "", outfile = "../output.json";
 	int alg = 0;
 	Command lastComm = Command::Other; 
 	for (int i = 1; i < argc; i++){
@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 
-	simulate(alg, itemsVec.data(), items, "dump.txt");
-		
+	simulate(alg, itemsVec.data(), items, outfile);
+
 	return 0;
 }

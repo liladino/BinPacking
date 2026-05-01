@@ -21,7 +21,7 @@ CATEGORY_WEIGHTS = {
 }
 
 N_ITEMS = 1000
-OUTPUT_FILE = "generated_items.csv"
+OUTPUT_FILE = "../data/generated_items.csv"
 
 # -----------------------------
 

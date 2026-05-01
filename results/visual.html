@@ -38,15 +38,19 @@ document.body.appendChild(renderer.domElement);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 
-const light = new THREE.DirectionalLight(0xffffff, 1);
-light.position.set(20, 20, 20);
-scene.add(light);
+// const light = new THREE.DirectionalLight(0xffffff, 1);
+// light.position.set(20, 20, 20);
+// scene.add(light);
+
+const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1); // Sky, Ground, Intensity
+scene.add(hemiLight);
+
 scene.add(new THREE.AmbientLight(0x404040));
 
 // ------------------------
 // Load bin and items
 // ------------------------
-const padding = 0.2; 
+const padding = 1; 
 async function loadBinData(url) {
     const response = await fetch(url);
     const data = await response.json();
@@ -80,10 +84,13 @@ function addBox(b) {
     // const geometry = new THREE.BoxGeometry(b.w, b.h, b.d);
 
     const material = new THREE.MeshPhongMaterial({
-        color: Math.random() * 0xffffff,
-        transparent: true,
-        opacity: 0.7
+        color: (1 - Math.random() ** 3) * 0xffffff,
+        transparent: false,
+        // opacity: 0.7,
+        // side: THREE.DoubleSide,
+        depthWrite: true
     });
+
 
     const mesh = new THREE.Mesh(geometry, material);
 

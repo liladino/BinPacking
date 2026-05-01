@@ -1,5 +1,5 @@
 CC = g++
-FLAGS = -Wall -O3
+FLAGS = -Wall -O3 -mstackrealign -static -static-libgcc -static-libstdc++
 
 # SRCS = $(wildcard *.cpp)
 # OBJS = $(SRCS:.cpp=.o)

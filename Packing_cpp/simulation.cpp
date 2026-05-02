@@ -86,6 +86,7 @@ void quickAlgo(Packer* packer, size_t items[], size_t n, const std::string& outf
 	writeMetaData(outfile, results[maxi].third);
 }
 
+//finds the minimal bin needed for given input without incremental algorithm
 void optimAlgo(Packer* packer, size_t items[], size_t n, const std::string& outfile){
 	std::vector<std::pair<std::string, Vec3>> limitsVector;
 	std::for_each(limits.begin(), limits.end(), 

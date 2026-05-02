@@ -33,28 +33,20 @@ def constrained_random_sample(file_path, max_items, max_volume):
         current_volume = potential_volume
         # items.remove(choice)
 
-    print(f"Selected {len(selected_items)} items.")
     return selected_items
-	
-def main():
-    parser = argparse.ArgumentParser(description="Generate constrained random input.")
-    
-    parser.add_argument("-i", "--input", required=True, help="Input CSV file")
-    parser.add_argument("-o", "--output", default="", help="Output file. Only stdout, if not specified.")
-    parser.add_argument("--max-items", type=int, default=15, help="Maximum number of items")
-    parser.add_argument("--max-volume", type=float, default=43500, help="Maximum total volume")
 
-    args = parser.parse_args()   
 
-    result = constrained_random_sample(
-        args.input,
-        args.max_items,
-        args.max_volume
-    )
+def generate_output(input_path, output_path, max_items, max_volume, printToStdout = False):
+    result = constrained_random_sample(input_path, max_items, max_volume)
 
+    sum_volume = 0
+            
     if not result:
-        print("No result generated.")
+        if printToStdout:
+            print("No result generated.")
         return
+    if printToStdout:
+        print(f"Selected {len(result)} items.")
 
     sum_volume = 0
 
@@ -63,13 +55,26 @@ def main():
         line = f"{i['length_mm']} {i['width_mm']} {i['height_mm']}"
         print(line, file=output)
         sum_volume += i['volume_cm3'] 
+
+    if printToStdout: 
+        print(output.getvalue())
+        print(f"Sum volume: {sum_volume}")
     
-    print(output.getvalue())   
-    print(f"Sum volume: {sum_volume}")
-    
-    if ("" != args.output):
-        with open(args.output, "w") as f:
+    if ("" != output_path):
+        with open(output_path, "w") as f:
             f.write(output.getvalue())
+
+def main():
+    parser = argparse.ArgumentParser(description="Generate constrained random input.")
+    
+    parser.add_argument("-i", "--input", required=True, help="Input CSV file")
+    parser.add_argument("-o", "--output", default="", help="Output file. Only stdout, if not specified.")
+    parser.add_argument("--max-items", type=int, default=15, help="Maximum number of items")
+    parser.add_argument("--max-volume", type=float, default=43500, help="Maximum total volume")
+
+    args = parser.parse_args()
+
+    generate_output(args.input, args.output, args.max_items, args.max_volume, True)
     
 if __name__ == "__main__":
     main()

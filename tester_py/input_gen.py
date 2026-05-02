@@ -62,8 +62,6 @@ def main():
     for i in result:
         line = f"{i['length_mm']} {i['width_mm']} {i['height_mm']}"
         print(line, file=output)
-        # f.write(line + "\n")
-        # print(line)
         sum_volume += i['volume_cm3'] 
     
     print(output.getvalue())   

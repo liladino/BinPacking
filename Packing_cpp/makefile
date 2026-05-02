@@ -1,5 +1,5 @@
 CC = g++
-FLAGS = -Wall -O3 -mstackrealign -static -static-libgcc -static-libstdc++
+FLAGS = -Wall
 
 # SRCS = $(wildcard *.cpp)
 # OBJS = $(SRCS:.cpp=.o)
@@ -14,8 +14,11 @@ FLAGS = -Wall -O3 -mstackrealign -static -static-libgcc -static-libstdc++
 test: test.o
 	$(CC) $(FLAGS) test.o -o $@ 
 
-all:
-	$(CC) $(FLAGS) main.cpp simulation.cpp io.cpp
+all: main.o simulation.o io.o
+	$(CC) $(FLAGS) main.o simulation.o io.o
+
+opt:
+	$(CC) -Wall -O3 -mstackrealign -static -static-libgcc -static-libstdc++ main.cpp simulation.cpp io.cpp
 
 clean:
 	rm *.o

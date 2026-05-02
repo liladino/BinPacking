@@ -8,7 +8,6 @@ std::string jsonData(const std::string& name, T val){
 }
 template<>
 std::string jsonData<std::string>(const std::string& name, std::string val){
-	std::cout << "sdfsdfdf";
 	std::stringstream ss;
 	ss << "\"" << name << "\": \"" << val << "\"";
 	return ss.str();
@@ -55,20 +54,17 @@ void exportPackingToJSON(Packer* packer, const std::string& outfile){
 }
 
 size_t importItems(const std::string& infile, std::vector<size_t>& items){
-	std::cerr << "impcall\n";
 	std::ifstream data(infile);
-	std::cerr << "data\n";
 
 	if (!data.is_open()){
 		std::cerr << "Couldn't open file " << infile << std::endl;
 		return 0;
 	}
-	std::cerr << "open\n";
+	
 	size_t x;
 	while (data >> x){
 		items.push_back(x);
 	}
-	std::cerr << "xx\n";
 
 	while (items.size() % 3 != 0) {
 		items.pop_back();
@@ -117,5 +113,8 @@ void writeMetaData(const std::string& outfile, const std::string& data){
 		return;
 	}
 	f << data;
+
+	std::cerr << data << std::endl;
+
 	f.close();
 }

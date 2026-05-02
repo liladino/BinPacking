@@ -2,8 +2,8 @@
 
 std::map<std::string, Vec3> limits = 
 {
-	{"test1", {10, 10, 10}},
-	{"test2", {12, 10, 12}},
+	// {"test1", {10, 10, 10}},
+	// {"test2", {12, 10, 12}},
 	{"xs", {235, 150, 120}},
 	{"s",  {300, 240,  60}},
 	{"m",  {500, 300, 140}},
@@ -24,8 +24,7 @@ struct trio{
 	T1 first; T2 second; T3 third;
 };
 
-void simul(Packer* packer, size_t items[], size_t n, const std::string& outfile){
-	const std::string visualFileName = "../data", visualFileType = ".json";
+void quickAlgo(Packer* packer, size_t items[], size_t n, const std::string& outfile){
 	std::vector<trio<size_t, size_t, std::string>> results;
 	for (size_t chainIndex = 0; chainIndex < chains.size(); chainIndex++){
 		packer->clear();
@@ -87,11 +86,56 @@ void simul(Packer* packer, size_t items[], size_t n, const std::string& outfile)
 	writeMetaData(outfile, results[maxi].third);
 }
 
-void greedy(size_t chainIndex, size_t items[], size_t n, int policy, std::string outfile){
+void optimAlgo(Packer* packer, size_t items[], size_t n, const std::string& outfile){
+	std::vector<std::pair<std::string, Vec3>> limitsVector;
+	std::for_each(limits.begin(), limits.end(), 
+		[&](auto x){ 
+			limitsVector.push_back(x);
+		});
+	std::sort(limitsVector.begin(), limitsVector.end(), 
+		[](const auto& l, const auto& r){ 
+			return l.second[0] * l.second[1] * l.second[2] < r.second[0] * r.second[1] * r.second[2];
+		});
+
+	for (auto x : limitsVector){ 
+			std::cout << x.first << ' ';
+		}
 	
+	std::vector<trio<size_t, size_t, std::string>> results;
+
+	for (const auto& [limitName, currentLimits] : limitsVector) {
+		packer->clear();
+		packer->setLimits(currentLimits[0], currentLimits[1], currentLimits[2]);
+
+		size_t i = 0, itemID = 0;
+		bool success = true;
+		while (itemID < n) {
+			Item item(items[i], items[i+1], items[i+2], itemID);
+
+			if (packer->pack(item)) {
+				itemID++;
+				i += 3;
+			}
+			else {
+				success = false;
+				itemID++;
+				i += 3;
+			}
+		}
+
+		if (success){
+			auto meta = metaDataToJSON(limitName, n, packer);
+			writeMetaData(outfile, meta);
+			return;
+		}
+	}
+
+	//couldn't fit all
+	auto meta = metaDataToJSON(limitsVector[limitsVector.size()-1].first, n, packer);
+	writeMetaData(outfile, meta);
 }
 
-void simulate(size_t algorithm, size_t items[], size_t n, const std::string& outfile){
+void simulate(size_t algorithm, size_t items[], size_t n, const std::string& outfile, bool optimal){
 	if (algorithm < 4){
 		GreedyPacker greedy;
 		switch (algorithm){
@@ -100,10 +144,22 @@ void simulate(size_t algorithm, size_t items[], size_t n, const std::string& out
 			case 3: greedy.setPolicy(std::make_unique<RP_tryFirstFitting>()); break;
 			default: break;
 		}
-		simul(&greedy, items, n, outfile);
+
+		if (optimal){
+			optimAlgo(&greedy, items, n, outfile);
+		}
+		else {
+			quickAlgo(&greedy, items, n, outfile);
+		}
+
 	}
 	else if (algorithm == 4){
 		ShelfPacker s;
-		simul(&s, items, n, outfile);
+		if (optimal){
+			optimAlgo(&s, items, n, outfile);
+		}
+		else {
+			quickAlgo(&s, items, n, outfile);
+		}
 	}
 }

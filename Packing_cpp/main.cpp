@@ -21,6 +21,7 @@ int main(int argc, char *argv[]) {
 
 	string infile = "", outfile = "output.json", visual = "";
 	int alg = 0;
+	bool optimal = false;
 	Command lastComm = Command::Other; 
 	for (int i = 1; i < argc; i++){
 		if (0 == strcmp("--input", argv[i]) || 0 == strcmp("-i", argv[i])){
@@ -34,6 +35,9 @@ int main(int argc, char *argv[]) {
 		}
 		else if (0 == strcmp("--visual", argv[i]) || 0 == strcmp("-v", argv[i])){
 			lastComm = Command::Visual;
+		}
+		else if (0 == strcmp("--optimal", argv[i])){
+			optimal = true;
 		}
 		else {
 			if (Command::Input == lastComm) {
@@ -58,17 +62,16 @@ int main(int argc, char *argv[]) {
 
 	std::vector<size_t> itemsVec;
 	size_t items = importItems(infile, itemsVec); 
-	std::cerr << "imp\n";
 	if (items == 0){
 		std::cerr << "No items" << std::endl;
 		return 0;
 	}
 
 	if ("" != visual){
-		simulate(alg, itemsVec.data(), items, outfile);
+		simulate(alg, itemsVec.data(), items, outfile, optimal);
 	}
 	else {
-		simulate(alg, itemsVec.data(), items, outfile);
+		simulate(alg, itemsVec.data(), items, outfile, optimal);
 	}
 	
 	return 0;

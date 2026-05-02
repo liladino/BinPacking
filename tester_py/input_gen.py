@@ -1,5 +1,7 @@
 import csv
 import random
+import argparse
+import io
 
 def constrained_random_sample(file_path, max_items, max_volume):
     items = []
@@ -33,23 +35,43 @@ def constrained_random_sample(file_path, max_items, max_volume):
 
     print(f"Selected {len(selected_items)} items.")
     return selected_items
-
-# --- Configuration ---
-N = 15             # Max items
-M = 43500          # Max volume (cm3)
-FILENAME = 'generated_items.csv'
-
-sum_volume = 0
-result = constrained_random_sample(FILENAME, N, M)
-
-if result:
-    with open("input.txt", "w") as f:   
-        for i in result:
-            f.write(f"{i['length_mm']} {i['width_mm']} {i['height_mm']} ")
-            print(f"{i['length_mm']} {i['width_mm']} {i['height_mm']} ")
-            sum_volume += i['volume_cm3']
-    
-    print(f"sum volume: {sum_volume}")
-    
 	
-	
+def main():
+    parser = argparse.ArgumentParser(description="Generate constrained random input.")
+    
+    parser.add_argument("-i", "--input", required=True, help="Input CSV file")
+    parser.add_argument("-o", "--output", default="", help="Output file. Only stdout, if not specified.")
+    parser.add_argument("--max-items", type=int, default=15, help="Maximum number of items")
+    parser.add_argument("--max-volume", type=float, default=43500, help="Maximum total volume")
+
+    args = parser.parse_args()   
+
+    result = constrained_random_sample(
+        args.input,
+        args.max_items,
+        args.max_volume
+    )
+
+    if not result:
+        print("No result generated.")
+        return
+
+    sum_volume = 0
+
+    output = io.StringIO()
+    for i in result:
+        line = f"{i['length_mm']} {i['width_mm']} {i['height_mm']}"
+        print(line, file=output)
+        # f.write(line + "\n")
+        # print(line)
+        sum_volume += i['volume_cm3'] 
+    
+    print(output.getvalue())   
+    print(f"Sum volume: {sum_volume}")
+    
+    if ("" != args.output):
+        with open(args.output, "w") as f:
+            f.write(output.getvalue())
+    
+if __name__ == "__main__":
+    main()

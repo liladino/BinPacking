@@ -62,3 +62,7 @@ build/
 
 #test data
 *.csv
+
+#cache
+__pycache__
+*.pyc

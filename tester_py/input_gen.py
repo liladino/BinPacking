@@ -35,34 +35,41 @@ def constrained_random_sample(file_path, max_items, max_volume):
 
     return selected_items
 
-
-def generate_random_items(input_path, output_path = "", max_items = 15, max_volume = 43500, printToStdout = True):
+def generate_random_items(input_path, output_path="", max_items=15, max_volume=43500, printToStdout=True, sorted=False):
     result = constrained_random_sample(input_path, max_items, max_volume)
 
-    sum_volume = 0
-            
     if not result:
         if printToStdout:
             print("No result generated.")
         return
+
     if printToStdout:
         print(f"Selected {len(result)} items.")
 
+    items = []
     sum_volume = 0
 
-    output = io.StringIO()
     for i in result:
-        line = f"{i['length_mm']} {i['width_mm']} {i['height_mm']}"
-        print(line, file=output)
-        sum_volume += i['volume_cm3'] 
+        l = int(i['length_mm'])
+        w = int(i['width_mm']) 
+        h = int(i['height_mm'])
 
-    if printToStdout: 
-        print(output.getvalue())
+        items.append((l, w, h))
+        sum_volume += i['volume_cm3']
+
+    if sorted:
+        items.sort(key=lambda x: x[0] * x[1] * x[2], reverse=True)
+
+    lines = [f"{l} {w} {h}" for (l, w, h) in items]
+    output_text = "\n".join(lines)
+
+    if printToStdout:
+        print(output_text)
         print(f"Sum volume: {sum_volume}")
-    
-    if ("" != output_path):
+
+    if output_path:
         with open(output_path, "w") as f:
-            f.write(output.getvalue())
+            f.write(output_text)
 
 def main():
     parser = argparse.ArgumentParser(description="Generate constrained random input.")

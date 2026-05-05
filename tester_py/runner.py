@@ -14,7 +14,8 @@ def generate_inputs(dataset, target_folder, number_of_files, max_items, max_volu
             file, 
             max_items, 
             max_volume, 
-            False)
+            False,
+            True)
         output_files.append(file)
     return output_files
 
@@ -95,9 +96,13 @@ def main():
     results = [0, 0]
     for i in range(tests):
         x = runComparison(str(PACKER), inputs[i], str(RESULTS))
-        if None != x and 0 != x:
-            results[x-1] += 1
-
+        if None != x:
+            if 0 != x:
+                results[x-1] += 1
+            # else:
+            #     results[0] += 1
+            #     results[1] += 1
+                
     print(f"Results:\nfirst fit\t{results[0]}\niterative\t{results[1]}")
 
 

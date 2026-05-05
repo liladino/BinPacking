@@ -9,9 +9,6 @@
 template<typename T>
 std::string jsonData(const std::string& name, T val);
 
-template<>
-std::string jsonData<const std::string&>(const std::string& name, const std::string& val);
-
 void exportPackingToJSON(Packer* packer, const std::string& outfile);
 std::string metaDataToJSON(const std::string& neededBin, size_t allItems, Packer* packer);
 void writeMetaData(const std::string& outfile, const std::string& data);

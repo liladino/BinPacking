@@ -114,7 +114,7 @@ void writeMetaData(const std::string& outfile, const std::string& data){
 	}
 	f << data;
 
-	std::cerr << data << std::endl;
+	// std::cerr << data << std::endl;
 
 	f.close();
 }

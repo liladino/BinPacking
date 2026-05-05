@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 import random
+from pathlib import Path
+import argparse
 
 # mean length, mean width, mean height (cm), deviation fraction
 CATEGORIES = {
@@ -19,11 +21,6 @@ CATEGORY_WEIGHTS = {
     "medium_box": 0.20,
     "large": 0.05,
 }
-
-N_ITEMS = 1000
-OUTPUT_FILE = "../data/generated_items.csv"
-
-# -----------------------------
 
 def sample_dimension(mean, std_fraction):
     std = mean * std_fraction
@@ -65,9 +62,23 @@ def generate_dataset(n_items):
 
     return pd.DataFrame(items)
 
-# -----------------------------
 
-df = generate_dataset(N_ITEMS)
+# py tester_py/data_gen.py --items 10000
+def main():
+    parser = argparse.ArgumentParser(description="Generate data set")
+    
+    parser.add_argument("--items", type=int, default=1000, help="Number of items in dataset")
+    args = parser.parse_args()
 
-df.to_csv(OUTPUT_FILE, index=False)
-print(f"Generated {len(df)} items -> {OUTPUT_FILE}")
+    PROJECT_ROOT = Path(__file__).resolve().parent.parent
+    N_ITEMS = args.items
+    OUTPUT_FILE = PROJECT_ROOT / "data" / "generated_items.csv"
+
+    df = generate_dataset(N_ITEMS)
+
+    df.to_csv(OUTPUT_FILE, index=False)
+    print(f"Generated {len(df)} items -> {OUTPUT_FILE}")
+
+   
+if __name__ == "__main__":
+    main()

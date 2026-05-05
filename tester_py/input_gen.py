@@ -36,7 +36,7 @@ def constrained_random_sample(file_path, max_items, max_volume):
     return selected_items
 
 
-def generate_output(input_path, output_path, max_items, max_volume, printToStdout = False):
+def generate_random_items(input_path, output_path = "", max_items = 15, max_volume = 43500, printToStdout = True):
     result = constrained_random_sample(input_path, max_items, max_volume)
 
     sum_volume = 0
@@ -74,7 +74,7 @@ def main():
 
     args = parser.parse_args()
 
-    generate_output(args.input, args.output, args.max_items, args.max_volume, True)
+    generate_random_items(args.input, args.output, args.max_items, args.max_volume, True)
     
 if __name__ == "__main__":
     main()

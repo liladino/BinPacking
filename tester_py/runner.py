@@ -49,11 +49,11 @@ def compare_first_fit_iterative(path_first_fit, path_iterative):
     return 0
 
 def runComparison(packer, input, results):
-    outfile1 = results + "/it.json"
-    outfile2 = results + "/ff.json"
+    outfile_iterative = results + "/it.json"
+    outfile_first_fit = results + "/ff.json"
     
-    args_set_a = ["--input", input, "--output", outfile1]
-    args_set_b = ["--input", input, "--output", outfile2, "--firstFit"]
+    args_set_a = ["--input", input, "--output", outfile_iterative]
+    args_set_b = ["--input", input, "--output", outfile_first_fit, "--firstFit"]
     
     try:
         # output = 
@@ -63,15 +63,15 @@ def runComparison(packer, input, results):
         subprocess.run([packer] + args_set_b, capture_output=True, text=True)
         # print(output)
 
-        if os.path.exists(outfile1) and os.path.exists(outfile2):
-            return compare_first_fit_iterative(outfile1, outfile2)
+        if os.path.exists(outfile_iterative) and os.path.exists(outfile_first_fit):
+            return compare_first_fit_iterative(outfile_first_fit, outfile_iterative)
         else:
             print("Error: One or both output files were not created.")
 
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while running the program: {e}")
     finally:
-       for f in [outfile1, outfile2]:
+       for f in [outfile_iterative, outfile_first_fit]:
            if os.path.exists(f):
               os.remove(f)
 

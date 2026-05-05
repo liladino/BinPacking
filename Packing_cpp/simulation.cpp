@@ -59,7 +59,7 @@ void incrementalAlgo(Packer* packer, size_t items[], size_t n, const std::string
 			}
 		}
 
-		exportPackingToJSON(packer, "../data.json");
+		// exportPackingToJSON(packer, "../data.json");
 		// exportPackingToJSON(packer, visualFileName + std::to_string(chainIndex) + visualFileType);
 
 		// char c; std::noskipws(std::cin); std::cin >> c;

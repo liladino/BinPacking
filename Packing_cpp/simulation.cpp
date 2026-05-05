@@ -24,7 +24,7 @@ struct trio{
 	T1 first; T2 second; T3 third;
 };
 
-void quickAlgo(Packer* packer, size_t items[], size_t n, const std::string& outfile){
+void incrementalAlgo(Packer* packer, size_t items[], size_t n, const std::string& outfile){
 	std::vector<trio<size_t, size_t, std::string>> results;
 	for (size_t chainIndex = 0; chainIndex < chains.size(); chainIndex++){
 		packer->clear();
@@ -87,7 +87,7 @@ void quickAlgo(Packer* packer, size_t items[], size_t n, const std::string& outf
 }
 
 //finds the minimal bin needed for given input without incremental algorithm
-void optimAlgo(Packer* packer, size_t items[], size_t n, const std::string& outfile){
+void firstFitAlgo(Packer* packer, size_t items[], size_t n, const std::string& outfile){
 	std::vector<std::pair<std::string, Vec3>> limitsVector;
 	std::for_each(limits.begin(), limits.end(), 
 		[&](auto x){ 
@@ -136,7 +136,7 @@ void optimAlgo(Packer* packer, size_t items[], size_t n, const std::string& outf
 	writeMetaData(outfile, meta);
 }
 
-void simulate(size_t algorithm, size_t items[], size_t n, const std::string& outfile, bool optimal){
+void simulate(size_t algorithm, size_t items[], size_t n, const std::string& outfile, bool firstFit){
 	if (algorithm < 4){
 		GreedyPacker greedy;
 		switch (algorithm){
@@ -146,21 +146,21 @@ void simulate(size_t algorithm, size_t items[], size_t n, const std::string& out
 			default: break;
 		}
 
-		if (optimal){
-			optimAlgo(&greedy, items, n, outfile);
+		if (firstFit){
+			firstFitAlgo(&greedy, items, n, outfile);
 		}
 		else {
-			quickAlgo(&greedy, items, n, outfile);
+			incrementalAlgo(&greedy, items, n, outfile);
 		}
 
 	}
 	else if (algorithm == 4){
 		ShelfPacker s;
-		if (optimal){
-			optimAlgo(&s, items, n, outfile);
+		if (firstFit){
+			firstFitAlgo(&s, items, n, outfile);
 		}
 		else {
-			quickAlgo(&s, items, n, outfile);
+			incrementalAlgo(&s, items, n, outfile);
 		}
 	}
 }

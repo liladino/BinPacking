@@ -67,11 +67,11 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 
-	if ("" != visual){
+	if ("" == visual){
 		simulate(alg, itemsVec.data(), items, outfile, firstFit);
 	}
 	else {
-		simulate(alg, itemsVec.data(), items, outfile, firstFit);
+		//TODO
 	}
 	
 	return 0;

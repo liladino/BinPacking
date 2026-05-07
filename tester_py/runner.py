@@ -4,6 +4,7 @@ import os
 import math
 from input_gen import generate_random_items
 from pathlib import Path
+import csv
 
 def generate_inputs(dataset, target_folder, number_of_files, max_items, max_volume):
     output_files = []
@@ -49,12 +50,12 @@ def compare_first_fit_iterative(path_first_fit, path_iterative):
         return 2
     return 0
 
-def runComparison(packer, input, results):
+def runComparison(packer, algorithm, input, results, remove_input = False):
     outfile_iterative = results + "/it.json"
     outfile_first_fit = results + "/ff.json"
     
-    args_set_a = ["--input", input, "--output", outfile_iterative]
-    args_set_b = ["--input", input, "--output", outfile_first_fit, "--firstFit"]
+    args_set_a = ["--input", input, "--algorithm", str(algorithm), "--output", outfile_iterative]
+    args_set_b = ["--input", input, "--algorithm", str(algorithm), "--output", outfile_first_fit, "--firstFit"]
     
     try:
         # output = 
@@ -72,9 +73,12 @@ def runComparison(packer, input, results):
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while running the program: {e}")
     finally:
-       for f in [outfile_iterative, outfile_first_fit]:
-           if os.path.exists(f):
-              os.remove(f)
+        for f in [outfile_iterative, outfile_first_fit]:
+            if os.path.exists(f):
+                os.remove(f)
+        if remove_input:
+            if os.path.exists(input):
+                os.remove(input)        
 
 
 def main():
@@ -84,27 +88,36 @@ def main():
     TARGETFOLDER = PROJECT_ROOT / "data"
     PACKER = PROJECT_ROOT / "Packing_cpp" / "packer.exe"
     RESULTS = PROJECT_ROOT / "results"
+    OUTPUT_JSON = PROJECT_ROOT / "results/comparison.json"
 
     # print(f"Project Root: {PROJECT_ROOT}")
     # print(f"Program Path: {PACKER}")
 
-    tests = 1000
+    tests = 10
     inputs = generate_inputs(str(DATASET), str(TARGETFOLDER), tests, 15, 43500)
 
     print("inputs generated")
 
-    results = [0, 0]
-    for i in range(tests):
-        x = runComparison(str(PACKER), inputs[i], str(RESULTS))
-        if None != x:
-            if 0 != x:
-                results[x-1] += 1
-            # else:
-            #     results[0] += 1
-            #     results[1] += 1
-                
-    print(f"Results:\nfirst fit\t{results[0]}\niterative\t{results[1]}")
+    json_rows = []
+    algorithms = 5
+    for algo in range(algorithms):
+        results = [0, 0]
 
+        for i in range(tests):
+            x = runComparison(str(PACKER), algo, inputs[i], str(RESULTS), (True if algo == algorithms-1 else False))
+            if x is not None:
+                if x != 0:
+                    results[x - 1] += 1
+
+        row = { "algorithm": algo, "sorted": True, "samples": tests, "first_fit": results[0], "iterative": results[1] }
+        json_rows.append(row)
+
+        print(f"Algo {algo}:\nfirst fit\t{results[0]}\niterative\t{results[1]}")
+
+    with open(OUTPUT_JSON, "w") as file:
+        json.dump(json_rows, file, indent=4)
+
+    print(f"CSV results written to: {OUTPUT_JSON}")
 
 
 if __name__ == "__main__":

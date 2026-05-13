@@ -10,13 +10,18 @@ def generate_inputs(dataset, target_folder, number_of_files, max_items, max_volu
     output_files = []
     for i in range(number_of_files):
         file = target_folder + "/items" + str(i).zfill(int(math.log10(number_of_files)+1)) + ".txt" 
+
+        if os.path.exists(file):
+            output_files.append(file)
+            continue
+
         generate_random_items(
             dataset, 
             file, 
             max_items, 
             max_volume, 
             False,
-            True)
+            False)
         output_files.append(file)
     return output_files
 
@@ -34,11 +39,11 @@ def compare_first_fit_iterative(path_first_fit, path_iterative):
         iterative = json.load(f2)
     
     if (first_fit.get("packed") > iterative.get("packed")):
-        print("hihihiha")
+        # print("hihihiha")
         return 1
     
     if (first_fit.get("packed") < iterative.get("packed")):
-        print("argghw")
+        # print("argghw")
         return 2
 
     # print(bin_dict[first_fit.get("bin_needed")])
@@ -68,7 +73,12 @@ def runComparison(packer, algorithm, input, results, remove_input = False):
         if os.path.exists(outfile_iterative) and os.path.exists(outfile_first_fit):
             return compare_first_fit_iterative(outfile_first_fit, outfile_iterative)
         else:
-            print("Error: One or both output files were not created.")
+            if os.path.exists(outfile_iterative):
+                print("Error: First fit result file not found.")
+            elif os.path.exists(outfile_first_fit):
+                print("Error: Iterative result file not found.")
+            else:
+                print("Error: No result file not found.")
 
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while running the program: {e}")
@@ -93,7 +103,7 @@ def main():
     # print(f"Project Root: {PROJECT_ROOT}")
     # print(f"Program Path: {PACKER}")
 
-    tests = 10
+    tests = 10000
     inputs = generate_inputs(str(DATASET), str(TARGETFOLDER), tests, 15, 43500)
 
     print("inputs generated")
@@ -104,7 +114,7 @@ def main():
         results = [0, 0]
 
         for i in range(tests):
-            x = runComparison(str(PACKER), algo, inputs[i], str(RESULTS), (True if algo == algorithms-1 else False))
+            x = runComparison(str(PACKER), algo, inputs[i], str(RESULTS)) #, (True if algo == algorithms-1 else False))
             if x is not None:
                 if x != 0:
                     results[x - 1] += 1

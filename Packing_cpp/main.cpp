@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
 
 	string infile = "", outfile = "output.json", visual = "";
 	int alg = 0;
-	bool firstFit = false;
+	bool firstFit = false, argVisual = false;
 	Command lastComm = Command::Other; 
 	for (int i = 1; i < argc; i++){
 		if (0 == strcmp("--input", argv[i]) || 0 == strcmp("-i", argv[i])){
@@ -35,6 +35,7 @@ int main(int argc, char *argv[]) {
 		}
 		else if (0 == strcmp("--visual", argv[i]) || 0 == strcmp("-v", argv[i])){
 			lastComm = Command::Visual;
+			argVisual = true;
 		}
 		else if (0 == strcmp("--firstFit", argv[i])){
 			firstFit = true;
@@ -50,7 +51,7 @@ int main(int argc, char *argv[]) {
 				alg = stoi(argv[i]);
 			}
 			else if (Command::Visual == lastComm) {
-				visual = stoi(argv[i]);
+				visual = argv[i];
 			}
 			lastComm = Command::Other;
 		}
@@ -58,6 +59,10 @@ int main(int argc, char *argv[]) {
 	if (infile == ""){
 		std::cerr << "No input specified" << std::endl;
 		return 0;
+	}
+	if ("" == visual && argVisual){
+		//visuals, but no file specified
+		visual = "data.json";
 	}
 
 	std::vector<size_t> itemsVec;
@@ -67,12 +72,7 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 
-	if ("" == visual){
-		simulate(alg, itemsVec.data(), items, outfile, firstFit);
-	}
-	else {
-		//TODO
-	}
+	simulate(alg, itemsVec.data(), items, outfile, firstFit, visual);
 	
 	return 0;
 }

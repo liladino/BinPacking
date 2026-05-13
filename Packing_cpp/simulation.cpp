@@ -24,8 +24,9 @@ struct trio{
 	T1 first; T2 second; T3 third;
 };
 
-void incrementalAlgo(Packer* packer, size_t items[], size_t n, const std::string& outfile){
+void incrementalAlgo(Packer* packer, size_t items[], size_t n, const std::string& outfile, const std::string& visualExp = ""){
 	std::vector<trio<size_t, size_t, std::string>> results;
+	std::vector<std::string> visuals;
 	for (size_t chainIndex = 0; chainIndex < chains.size(); chainIndex++){
 		packer->clear();
 
@@ -59,10 +60,11 @@ void incrementalAlgo(Packer* packer, size_t items[], size_t n, const std::string
 			}
 		}
 
-		// exportPackingToJSON(packer, "../data.json");
-		// exportPackingToJSON(packer, visualFileName + std::to_string(chainIndex) + visualFileType);
+		if ("" != visualExp){			
+			visuals.push_back(exportPacking(packer));
 
-		// char c; std::noskipws(std::cin); std::cin >> c;
+			exportPackingToJSON(visuals[visuals.size()-1], visualExp); char c; std::noskipws(std::cin); std::cin >> c;
+		}
 
 		auto meta = metaDataToJSON(chains[chainIndex][chain_j], n, packer);
 		// std::cout << meta << std::endl;
@@ -83,11 +85,12 @@ void incrementalAlgo(Packer* packer, size_t items[], size_t n, const std::string
 		}
 	}
 	
+	exportPackingToJSON(visuals[maxi], visualExp);
 	writeMetaData(outfile, results[maxi].third);
 }
 
 //finds the minimal bin needed for given input without incremental algorithm
-void firstFitAlgo(Packer* packer, size_t items[], size_t n, const std::string& outfile){
+void firstFitAlgo(Packer* packer, size_t items[], size_t n, const std::string& outfile, const std::string& visualExp = ""){
 	std::vector<std::pair<std::string, Vec3>> limitsVector;
 	std::for_each(limits.begin(), limits.end(), 
 		[&](auto x){ 
@@ -99,8 +102,8 @@ void firstFitAlgo(Packer* packer, size_t items[], size_t n, const std::string& o
 		});
 
 	for (auto x : limitsVector){ 
-			std::cout << x.first << ' ';
-		}
+		std::cout << x.first << ' ';
+	}
 	
 	std::vector<trio<size_t, size_t, std::string>> results;
 
@@ -127,6 +130,9 @@ void firstFitAlgo(Packer* packer, size_t items[], size_t n, const std::string& o
 		if (success){
 			auto meta = metaDataToJSON(limitName, n, packer);
 			writeMetaData(outfile, meta);
+			if ("" != visualExp){
+				exportPackingToJSON(packer, visualExp);
+			}
 			return;
 		}
 	}
@@ -134,9 +140,12 @@ void firstFitAlgo(Packer* packer, size_t items[], size_t n, const std::string& o
 	//couldn't fit all
 	auto meta = metaDataToJSON(limitsVector[limitsVector.size()-1].first, n, packer);
 	writeMetaData(outfile, meta);
+	if ("" != visualExp){
+		exportPackingToJSON(packer, visualExp);
+	}
 }
 
-void simulate(size_t algorithm, size_t items[], size_t n, const std::string& outfile, bool firstFit){
+void simulate(size_t algorithm, size_t items[], size_t n, const std::string& outfile, bool firstFit, const std::string& visualExp){
 	if (algorithm < 4){
 		GreedyPacker greedy;
 		switch (algorithm){
@@ -147,20 +156,19 @@ void simulate(size_t algorithm, size_t items[], size_t n, const std::string& out
 		}
 
 		if (firstFit){
-			firstFitAlgo(&greedy, items, n, outfile);
+			firstFitAlgo(&greedy, items, n, outfile, visualExp);
 		}
 		else {
-			incrementalAlgo(&greedy, items, n, outfile);
+			incrementalAlgo(&greedy, items, n, outfile, visualExp);
 		}
-
 	}
 	else if (algorithm == 4){
 		ShelfPacker s;
 		if (firstFit){
-			firstFitAlgo(&s, items, n, outfile);
+			firstFitAlgo(&s, items, n, outfile, visualExp);
 		}
 		else {
-			incrementalAlgo(&s, items, n, outfile);
+			incrementalAlgo(&s, items, n, outfile, visualExp);
 		}
 	}
 }

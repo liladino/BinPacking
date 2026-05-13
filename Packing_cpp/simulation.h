@@ -12,7 +12,6 @@
 #include <map>
 #include <sstream>
 
-
-void simulate(size_t algorithm, size_t items[], size_t n, const std::string& outfile, bool firstFit);
+void simulate(size_t algorithm, size_t items[], size_t n, const std::string& outfile, bool firstFit, const std::string& visualExp = "");
 
 #endif

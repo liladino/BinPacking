@@ -89,6 +89,7 @@ public:
 	}
 
 	double getBoundingBoxVolumeRatio(bool recalculate = true){
+		if (packed.size() == 0) return 0;
 		if (recalculate) calculateItemExtent();
 		return usedVolume() / (double)farthestXYZ[0] / (double)farthestXYZ[1] / (double)farthestXYZ[2];
 	}

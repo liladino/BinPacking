@@ -4,7 +4,6 @@ import os
 import math
 from input_gen import generate_random_items
 from pathlib import Path
-import csv
 
 def generate_inputs(dataset, target_folder, number_of_files, max_items, max_volume):
     output_files = []
@@ -33,17 +32,27 @@ def compare_first_fit_iterative(path_first_fit, path_iterative):
         "l" : 4,
         "xl" : 5
     }
+    # temp = input()
+    # print(temp)    
+    try:
+        with open(path_first_fit, 'r') as f1, open(path_iterative, 'r') as f2:
+            text1 = f1.read()
+            text2 = f2.read()
+        first_fit = json.loads(text1)
+        iterative = json.loads(text2)
 
-    with open(path_first_fit, 'r') as f1, open(path_iterative, 'r') as f2:
-        first_fit = json.load(f1)
-        iterative = json.load(f2)
+    except json.JSONDecodeError as e:
+        print("Invalid JSON")
+        print(e)
+        print("found:")
+        print(text1)
+        print(text2)
+        return
     
     if (first_fit.get("packed") > iterative.get("packed")):
-        # print("hihihiha")
         return 1
     
     if (first_fit.get("packed") < iterative.get("packed")):
-        # print("argghw")
         return 2
 
     # print(bin_dict[first_fit.get("bin_needed")])

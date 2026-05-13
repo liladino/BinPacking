@@ -108,20 +108,29 @@ std::string metaDataToJSON(const std::string& neededBin, size_t allItems, Packer
 		"all_items": 5,
 		"packed": 4,
 		"packed_items": [0, 1, 3, 4]
+		"min_leftover_slack": 1,
+		"sum_leftover_slack": 1,
+		"max_leftover_slack": 1,
+		"bounding_box_volume": 0.8
 	}
 	*/
 	std::stringstream ss;
 	ss << "{\n\t" << jsonData("bin_needed", neededBin) << ",\n";
 	ss << "\t" << jsonData("all_items", allItems) << ",\n";
 	ss << "\t" << jsonData("packed", packer->getPacked()) << ",\n";
+	
 	ss << "\t\"packed_items\": [";
 	std::string delim = " ";
 	for (const auto& x : packer->getPackedList()){
 		ss << delim << x.ID;
 		delim = ", ";
 	} 
-	ss << " ]\n";
-	// ss << "\t" << jsonData("used_volume_cm3", (double)packer->usedVolume() / 1000.0);
+	ss << " ],\n";
+
+	ss << "\t" << jsonData("min_leftover_slack", packer->getMinLeftoverSlack()) << ",\n";
+	ss << "\t" << jsonData("sum_leftover_slack", packer->getSumLeftoverSlack(false)) << ",\n";
+	ss << "\t" << jsonData("max_leftover_slack", packer->getMaxLeftoverSlack(false)) << ",\n";
+	ss << "\t" << jsonData("bounding_box_volume", packer->getBoundingBoxVolumeRatio(false)) << "\n";
 	ss << "}";
 	
 	return ss.str();

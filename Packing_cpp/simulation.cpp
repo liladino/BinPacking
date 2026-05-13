@@ -63,7 +63,7 @@ void incrementalAlgo(Packer* packer, size_t items[], size_t n, const std::string
 		if ("" != visualExp){			
 			visuals.push_back(exportPacking(packer));
 
-			exportPackingToJSON(visuals[visuals.size()-1], visualExp); char c; std::noskipws(std::cin); std::cin >> c;
+			// exportPackingToJSON(visuals[visuals.size()-1], visualExp); char c; std::noskipws(std::cin); std::cin >> c;
 		}
 
 		auto meta = metaDataToJSON(chains[chainIndex][chain_j], n, packer);
@@ -85,7 +85,7 @@ void incrementalAlgo(Packer* packer, size_t items[], size_t n, const std::string
 		}
 	}
 	
-	exportPackingToJSON(visuals[maxi], visualExp);
+	if ("" != visualExp) exportPackingToJSON(visuals[maxi], visualExp);
 	writeMetaData(outfile, results[maxi].third);
 }
 

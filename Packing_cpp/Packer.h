@@ -12,6 +12,19 @@ class Packer {
 protected:
 	std::vector<Item> packed;
 	Vec3 binSize;
+private:
+	/* Calculates the maximum extent of the items in the bin,
+	* assuming that the packing started from the 0, 0, 0 corner
+	*/
+	std::array<size_t, 3> farthestXYZ = {0, 0, 0};
+	void calculateItemExtent(){
+		farthestXYZ = {0, 0, 0};
+		for (const auto& item : packed){
+			for (size_t i = 0; i < 3; i++){
+				farthestXYZ[i] = std::max(item.getPos(i) + item[i], farthestXYZ[i]);
+			}
+		}
+	}
 public:
 	/* Sets the limits of the container.
 	 * Automatically sets the order to stand on its larget face.
@@ -40,6 +53,46 @@ public:
 		return packed.size();
 	}
 
+	size_t volume() const {
+		return binSize[0] * binSize[1] * binSize[2];
+	}
+	size_t usedVolume() const {
+		size_t acc = 0;
+		for (auto& x : packed) acc += x.volume(); 
+		return acc;
+	}
+
+	size_t getMinLeftoverSlack(bool recalculate = true){
+		if (recalculate) calculateItemExtent();
+		return std::min({
+			binSize[0] - farthestXYZ[0], 
+			binSize[1] - farthestXYZ[1], 
+			binSize[2] - farthestXYZ[2]
+		});
+	}
+
+	size_t getMaxLeftoverSlack(bool recalculate = true){
+    	if (recalculate) calculateItemExtent();
+		return std::max({
+			binSize[0] - farthestXYZ[0], 
+			binSize[1] - farthestXYZ[1], 
+			binSize[2] - farthestXYZ[2]
+		});
+	}
+
+	size_t getSumLeftoverSlack(bool recalculate = true){
+		if (recalculate) calculateItemExtent();
+		return 
+			binSize[0] - farthestXYZ[0] +
+			binSize[1] - farthestXYZ[1] +
+			binSize[2] - farthestXYZ[2];
+	}
+
+	double getBoundingBoxVolumeRatio(bool recalculate = true){
+		if (recalculate) calculateItemExtent();
+		return usedVolume() / (double)farthestXYZ[0] / (double)farthestXYZ[1] / (double)farthestXYZ[2];
+	}
+
 	bool intersects(const Item& a, const Item& b) const {
 		for (size_t i = 0; i < 3; ++i) {
 			const bool separated =
@@ -62,15 +115,6 @@ public:
 			if (toPack.getPos(i) + toPack[i] > binSize[i]) return false;
 		}
 		return true;
-	}
-
-	size_t volume() const {
-		return binSize[0] * binSize[1] * binSize[2];
-	}
-	size_t usedVolume() const {
-		size_t acc = 0;
-		for (auto& x : packed) acc += x.volume(); 
-		return acc;
 	}
 
 	virtual bool pack(Item& toPack) = 0;

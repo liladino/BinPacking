@@ -150,7 +150,7 @@ void simulate(size_t algorithm, size_t items[], size_t n, const std::string& out
 		GreedyPacker greedy;
 		switch (algorithm){
 			case 1: greedy.setPolicy(std::make_unique<RP_largestFaceUp>()); break;
-			case 2: greedy.setPolicy(std::make_unique<RP_minLeftoverSlack>()); break;
+			case 2: greedy.setPolicy(std::make_unique<RP_minSumLeftoverSlack>()); break;
 			case 3: greedy.setPolicy(std::make_unique<RP_tryFirstFitting>()); break;
 			default: break;
 		}

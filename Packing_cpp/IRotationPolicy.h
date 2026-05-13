@@ -67,7 +67,7 @@ struct RP_tryFirstFitting : IRotationPolicy {
 	}
 };
 
-struct RP_minLeftoverSlack : IRotationPolicy {
+struct RP_minSumLeftoverSlack : IRotationPolicy {
 	/* Order the edges of the bin to minimize leftover slack, 
 	* relative to the current container.
 	*/	 

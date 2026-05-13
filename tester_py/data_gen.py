@@ -37,7 +37,7 @@ def generate_item(category_name, item_id):
     h = sample_dimension(mean_h, std_frac)
 
     dims = [l, w, h]
-    # random.shuffle(dims)
+    random.shuffle(dims)
 
     return {
         "item_id": item_id,

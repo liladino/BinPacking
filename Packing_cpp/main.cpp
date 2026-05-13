@@ -13,6 +13,8 @@ enum class Command{
 
 
 // g++ main.cpp simulation.cpp io.cpp -Wall
+// cd Packing_cpp/; make all; cd ..
+// ./Packing_cpp/packer.exe -i "data/items00001.txt" -o "results/output.json"
 int main(int argc, char *argv[]) {
 	if (argc < 2){
 		std::cerr << "No input specified" << std::endl;

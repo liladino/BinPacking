@@ -20,7 +20,7 @@ def generate_inputs(dataset, target_folder, number_of_files, max_items, max_volu
             max_items, 
             max_volume, 
             False,
-            False)
+            True)
         output_files.append(file)
     return output_files
 

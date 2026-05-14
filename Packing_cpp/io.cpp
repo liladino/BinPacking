@@ -45,16 +45,6 @@ std::string exportPacking(Packer* packer){
 }
 
 void exportPackingToJSON(Packer* packer, const std::string& outfile){
-	/* Format:
-	{
-		"bin": { "w": 15, "h": 9, "d": 8 },
-		"items": [
-			{ "x": 0, "y": 0, "z": 0, "w": 4, "h": 4, "d": 4 },
-			{ "x": 4, "y": 0, "z": 0, "w": 3, "h": 5, "d": 2 },
-			{ "x": 0, "y": 4, "z": 0, "w": 2, "h": 3, "d": 6 }
-		]
-	}
-	*/
 	std::ofstream data(outfile);
 	if (!data.is_open()){
 		std::cerr << "Couldn't open file " << outfile << std::endl;
@@ -107,11 +97,11 @@ std::string metaDataToJSON(const std::string& neededBin, size_t allItems, Packer
 	}
 	*/
 	std::stringstream ss;
-	ss << "{\n\t" << jsonData("bin_needed", neededBin) << ",\n";
-	ss << "\t" << jsonData("all_items", allItems) << ",\n";
-	ss << "\t" << jsonData("packed", packer->getPacked()) << ",\n";
+	ss << "\t{\n\t\t" << jsonData("bin_needed", neededBin) << ",\n";
+	ss << "\t\t" << jsonData("all_items", allItems) << ",\n";
+	ss << "\t\t" << jsonData("packed", packer->getPacked()) << ",\n";
 	
-	ss << "\t\"packed_items\": [";
+	ss << "\t\t\"packed_items\": [";
 	std::string delim = " ";
 	for (const auto& x : packer->getPackedList()){
 		ss << delim << x.ID;
@@ -119,22 +109,22 @@ std::string metaDataToJSON(const std::string& neededBin, size_t allItems, Packer
 	} 
 	ss << " ],\n";
 
-	ss << "\t" << jsonData("min_leftover_slack", packer->getMinLeftoverSlack()) << ",\n";
-	ss << "\t" << jsonData("sum_leftover_slack", packer->getSumLeftoverSlack(false)) << ",\n";
-	ss << "\t" << jsonData("max_leftover_slack", packer->getMaxLeftoverSlack(false)) << ",\n";
-	ss << "\t" << jsonData("bounding_box_volume_ratio", packer->getBoundingBoxVolumeRatio(false)) << "\n";
-	ss << "}";
+	ss << "\t\t" << jsonData("min_leftover_slack", packer->getMinLeftoverSlack()) << ",\n";
+	ss << "\t\t" << jsonData("sum_leftover_slack", packer->getSumLeftoverSlack(false)) << ",\n";
+	ss << "\t\t" << jsonData("max_leftover_slack", packer->getMaxLeftoverSlack(false)) << ",\n";
+	ss << "\t\t" << jsonData("bounding_box_volume_ratio", packer->getBoundingBoxVolumeRatio(false)) << "\n";
+	ss << "\t}";
 	
 	return ss.str();
 }
 
+void writeMetaData(std::ostream* outfile, const std::vector<std::string>& data){
+	if (data.size() == 0) return;
 
-void writeMetaData(std::ostream* outfile, const std::string& data){
-	// if (!outfile->is_open()){
-	// 	std::cerr << "Couldn't open file " << outfile << std::endl;
-	// 	return;
-	// }
-	*outfile << data;
-	// std::cerr << data << std::endl;
-	// f.close();
+	std::string x = "[\n";
+	for (const auto& str : data){
+		*outfile << x << str;
+		x = ",\n";
+	}
+	*outfile << "\n]";	
 }

@@ -12,6 +12,12 @@
 #include <map>
 #include <sstream>
 
-void simulate(size_t algorithm, size_t items[], size_t n, std::ostream* outfile, bool firstFit, const std::string& visualExp = "");
+enum class ShipPolicy{
+	SkipIfDoesntFit,
+	StopIfDoesntFit,
+	ShipEverything
+};
+
+void simulate(size_t algorithm, size_t items[], size_t n, std::ostream* outfile, bool firstFit, ShipPolicy shipPolicy, const std::string& visualExp = "");
 
 #endif

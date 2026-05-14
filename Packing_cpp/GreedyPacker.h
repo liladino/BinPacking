@@ -23,6 +23,7 @@ class GreedyPacker : public Packer {
 	}
 	void init(){
 		packed = {};
+		pointsOfInterest.clear();
 		pointsOfInterest.insert(Vec3(0, 0, 0));
 		binSize = {1, 1, 1};
 	}

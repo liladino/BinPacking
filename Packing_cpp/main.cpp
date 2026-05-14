@@ -19,7 +19,10 @@ int main(int argc, char *argv[]) {
 	string inputFilePath = "", outputFilePath = "", visual = "";
 	int alg = 0;
 	bool firstFit = false, argVisual = false;
+
+	ShipPolicy shipPolicy = ShipPolicy::SkipIfDoesntFit;
 	Command lastComm = Command::Other; 
+	
 	for (int i = 1; i < argc; i++){
 		if (0 == strcmp("--input", argv[i]) || 0 == strcmp("-i", argv[i])){
 			lastComm = Command::Input;
@@ -35,7 +38,20 @@ int main(int argc, char *argv[]) {
 			argVisual = true;
 		}
 		else if (0 == strcmp("--firstFit", argv[i])){
+			lastComm = Command::Other;
 			firstFit = true;
+		}
+		else if (0 == strcmp("--shipEverything", argv[i])){
+			lastComm = Command::Other;
+			shipPolicy = ShipPolicy::ShipEverything;
+		}
+		else if (0 == strcmp("--skipIfDoesntFit", argv[i])){
+			lastComm = Command::Other;
+			shipPolicy = ShipPolicy::SkipIfDoesntFit;
+		}
+		else if (0 == strcmp("--stopIfDoesntFit", argv[i])){
+			lastComm = Command::Other;
+			shipPolicy = ShipPolicy::StopIfDoesntFit;
 		}
 		else {
 			if (Command::Input == lastComm) {
@@ -98,7 +114,7 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	simulate(alg, itemsVec.data(), items, outputStream, firstFit, visual);
+	simulate(alg, itemsVec.data(), items, outputStream, firstFit, shipPolicy, visual);
 	if (outputStream == &outFile){
 		outFile.close();
 	}

@@ -18,13 +18,27 @@ std::vector<std::vector<std::string>> chains =
 	{"s",  "m", "l", "xl"}
 };
 
-
 template <typename T1, typename T2, typename T3> 
 struct trio{
 	T1 first; T2 second; T3 third;
 };
 
-void incrementalAlgo(Packer* packer, size_t items[], size_t n, std::ostream* outfile, const std::string& visualExp = ""){
+size_t packWhileItCan(Packer* packer, size_t items[], const size_t n, size_t _itemID){
+	while (_itemID < n) {
+		size_t i = _itemID * 3;
+		Item item(items[i], items[i+1], items[i+2], _itemID);
+
+		if (packer->pack(item)) {
+			_itemID++;
+		}
+		else {
+			return _itemID;
+		}
+	}
+	return _itemID;
+}
+
+std::pair<size_t, std::string> incrementalAlgo(Packer* packer, size_t items[], const size_t n, const size_t itemID, const ShipPolicy shipPolicy, const std::string& visualExp = ""){
 	std::vector<trio<size_t, size_t, std::string>> results;
 	std::vector<std::string> visuals;
 	for (size_t chainIndex = 0; chainIndex < chains.size(); chainIndex++){
@@ -33,37 +47,34 @@ void incrementalAlgo(Packer* packer, size_t items[], size_t n, std::ostream* out
 		auto limit = limits[chains[chainIndex][0]];
 		packer->setLimits(limit[0], limit[1], limit[2]);
 
-		size_t chain_j = 0, i = 0, itemID = 0, succ = 0;
-
-		while (itemID < n) {
-			// cout << "Trying to pack " << itemID+1 << "." << endl;
-			Item item(items[i], items[i+1], items[i+2], itemID);
-
-			if (packer->pack(item)) {
-				itemID++;
-				succ++;
-				i += 3;
+		size_t chain_j = 0;
+		size_t _itemID = itemID;
+		_itemID = packWhileItCan(packer, items, n, _itemID);
+		while (_itemID < n){
+			//try a bigger bin
+			if (chain_j+1 < chains[chainIndex].size()){
+				chain_j++;
+				limit = limits[chains[chainIndex][chain_j]];
+				packer->setLimits(limit[0], limit[1], limit[2]);
 			}
-			else {
-				if (chain_j+1 < chains[chainIndex].size()){
-					chain_j++;
-					limit = limits[chains[chainIndex][chain_j]];
-					packer->setLimits(limit[0], limit[1], limit[2]);
-					// std::cout << "at " << itemID+1 << ". resized to " << chains[chainIndex][chain_j] << " bin." << std::endl;
+			else{
+				//no bigger bin left
+				if (ShipPolicy::SkipIfDoesntFit == shipPolicy){
+					_itemID++;
 				}
-				else{
-					//item couldnt be fit into biggest bin, skip
-					itemID++;
-					i += 3;
-					// break;
+				else if (ShipPolicy::StopIfDoesntFit == shipPolicy){
+					break;
+				}
+				else if (ShipPolicy::ShipEverything == shipPolicy){
+					break;
 				}
 			}
+			_itemID = packWhileItCan(packer, items, n, _itemID);
 		}
 
 		if ("" != visualExp){			
 			visuals.push_back(exportPacking(packer));
-
-			// exportPackingToJSON(visuals[visuals.size()-1], visualExp); char c; std::noskipws(std::cin); std::cin >> c;
+			char c; std::noskipws(std::cin); std::cin >> c;
 		}
 
 		auto meta = metaDataToJSON(chains[chainIndex][chain_j], n, packer);
@@ -86,11 +97,11 @@ void incrementalAlgo(Packer* packer, size_t items[], size_t n, std::ostream* out
 	}
 	
 	if ("" != visualExp) exportPackingToJSON(visuals[maxi], visualExp);
-	writeMetaData(outfile, results[maxi].third);
+	return {results[maxi].first, results[maxi].third};
 }
 
 //finds the minimal bin needed for given input without incremental algorithm
-void firstFitAlgo(Packer* packer, size_t items[], size_t n, std::ostream* outfile, const std::string& visualExp = ""){
+std::pair<size_t, std::string> firstFitAlgo(Packer* packer, size_t items[], const size_t n, const size_t itemID, const ShipPolicy shipPolicy, const std::string& visualExp = ""){
 	std::vector<std::pair<std::string, Vec3>> limitsVector;
 	std::for_each(limits.begin(), limits.end(), 
 		[&](auto x){ 
@@ -100,75 +111,93 @@ void firstFitAlgo(Packer* packer, size_t items[], size_t n, std::ostream* outfil
 		[](const auto& l, const auto& r){ 
 			return l.second[0] * l.second[1] * l.second[2] < r.second[0] * r.second[1] * r.second[2];
 		});
-
-	// for (auto x : limitsVector){ 
-	// 	std::cout << x.first << ' ';
-	// }
 	
 	std::vector<trio<size_t, size_t, std::string>> results;
 
 	for (const auto& [limitName, currentLimits] : limitsVector) {
 		packer->clear();
 		packer->setLimits(currentLimits[0], currentLimits[1], currentLimits[2]);
+		size_t _itemID = itemID;
 
-		size_t i = 0, itemID = 0;
-		bool success = true;
-		while (itemID < n) {
-			Item item(items[i], items[i+1], items[i+2], itemID);
-
-			if (packer->pack(item)) {
-				itemID++;
-				i += 3;
+		_itemID = packWhileItCan(packer, items, n, _itemID);
+		while (_itemID < n){
+			if (ShipPolicy::SkipIfDoesntFit == shipPolicy){
+				if (limitName == limitsVector[limitsVector.size()-1].first){
+					//only if xl size, skip
+					_itemID++;
+				}
+				else {
+					break;
+				}
 			}
-			else {
-				success = false;
-				itemID++;
-				i += 3;
+			else if (ShipPolicy::StopIfDoesntFit == shipPolicy){
+				break;
 			}
+			else if (ShipPolicy::ShipEverything == shipPolicy){
+				break;
+			}
+			_itemID = packWhileItCan(packer, items, n, _itemID);
 		}
 
-		if (success){
+		if (_itemID == n){
 			auto meta = metaDataToJSON(limitName, n, packer);
-			writeMetaData(outfile, meta);
 			if ("" != visualExp){
 				exportPackingToJSON(packer, visualExp);
+				char c; std::noskipws(std::cin); std::cin >> c;
 			}
-			return;
+			return {packer->getPacked(), meta};
 		}
 	}
 
 	//couldn't fit all
 	auto meta = metaDataToJSON(limitsVector[limitsVector.size()-1].first, n, packer);
-	writeMetaData(outfile, meta);
 	if ("" != visualExp){
 		exportPackingToJSON(packer, visualExp);
+		char c; std::noskipws(std::cin); std::cin >> c;
 	}
+	return {packer->getPacked(), meta};
 }
 
-void simulate(size_t algorithm, size_t items[], size_t n, std::ostream* outfile, bool firstFit, const std::string& visualExp){
+void simulate(size_t algorithm, size_t items[], const size_t n, std::ostream* outfile, bool firstFit, const ShipPolicy shipPolicy, const std::string& visualExp){
+	Packer* packer = nullptr;
+	GreedyPacker greedy;
+	ShelfPacker shelf;
+	
 	if (algorithm < 4){
-		GreedyPacker greedy;
 		switch (algorithm){
 			case 1: greedy.setPolicy(std::make_unique<RP_largestFaceUp>()); break;
 			case 2: greedy.setPolicy(std::make_unique<RP_minSumLeftoverSlack>()); break;
 			case 3: greedy.setPolicy(std::make_unique<RP_tryFirstFitting>()); break;
 			default: break;
 		}
-
-		if (firstFit){
-			firstFitAlgo(&greedy, items, n, outfile, visualExp);
-		}
-		else {
-			incrementalAlgo(&greedy, items, n, outfile, visualExp);
-		}
+		packer = &greedy;
 	}
 	else if (algorithm == 4){
-		ShelfPacker s;
-		if (firstFit){
-			firstFitAlgo(&s, items, n, outfile, visualExp);
-		}
-		else {
-			incrementalAlgo(&s, items, n, outfile, visualExp);
-		}
+		packer = &shelf;
 	}
+		
+	size_t itemID = 0, lastItemID = 0;
+	std::vector<std::string> jsonArray;
+	while (itemID < n){
+		if (firstFit){
+			auto [x, str] = firstFitAlgo(packer, items, n, itemID, shipPolicy, visualExp);
+			jsonArray.push_back(str);
+			itemID += x;
+		}
+		else{
+			auto [x, str] = incrementalAlgo(packer, items, n, itemID, shipPolicy, visualExp);
+			jsonArray.push_back(str);
+			itemID += x;
+		}
+		if (ShipPolicy::ShipEverything != shipPolicy){
+			break;
+		}
+		if (lastItemID == itemID){
+			//couldn't fit the current item into any bin
+			break; 
+		}
+		lastItemID = itemID;
+	}
+
+	writeMetaData(outfile, jsonArray);
 }

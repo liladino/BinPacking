@@ -20,7 +20,7 @@ def generate_inputs(dataset, target_folder, number_of_files, max_items, max_volu
             max_items, 
             max_volume, 
             False,
-            True)
+            False)
         output_files.append(file)
     return output_files
 
@@ -82,6 +82,8 @@ def runComparison(packer, algorithm, input, results, remove_input = False):
         if os.path.exists(outfile_iterative) and os.path.exists(outfile_first_fit):
             return compare_first_fit_iterative(outfile_first_fit, outfile_iterative)
         else:
+            print("for input:")
+            print(input)
             if os.path.exists(outfile_iterative):
                 print("Error: First fit result file not found.")
             elif os.path.exists(outfile_first_fit):
@@ -97,26 +99,9 @@ def runComparison(packer, algorithm, input, results, remove_input = False):
                 os.remove(f)
         if remove_input:
             if os.path.exists(input):
-                os.remove(input)        
+                os.remove(input) 
 
-
-def main():
-    PROJECT_ROOT = Path(__file__).resolve().parent.parent
-    PACKER = PROJECT_ROOT / "Packing_cpp" / "packer"
-    DATASET = PROJECT_ROOT / "data" / "generated_items.csv"
-    TARGETFOLDER = PROJECT_ROOT / "data"
-    PACKER = PROJECT_ROOT / "Packing_cpp" / "packer.exe"
-    RESULTS = PROJECT_ROOT / "results"
-    OUTPUT_JSON = PROJECT_ROOT / "results/comparison.json"
-
-    # print(f"Project Root: {PROJECT_ROOT}")
-    # print(f"Program Path: {PACKER}")
-
-    tests = 10000
-    inputs = generate_inputs(str(DATASET), str(TARGETFOLDER), tests, 15, 43500)
-
-    print("inputs generated")
-
+def evaluateComparison(PACKER, RESULTS, OUTPUT_JSON, inputs, tests):
     json_rows = []
     algorithms = 5
     for algo in range(algorithms):
@@ -136,7 +121,79 @@ def main():
     with open(OUTPUT_JSON, "w") as file:
         json.dump(json_rows, file, indent=4)
 
-    print(f"CSV results written to: {OUTPUT_JSON}")
+    print(f"results written to: {OUTPUT_JSON}")
+
+def numberOfPacked(packer, algorithm, input, results, remove_input = False):
+    outfile_iterative = results + "/it.json"
+    args_set = ["--input", input, "--algorithm", str(algorithm), "--output", outfile_iterative]
+    try: 
+        subprocess.run([packer] + args_set, capture_output=True, text=True)
+        
+        if os.path.exists(outfile_iterative):
+            try:
+                with open(outfile_iterative, 'r') as f1:
+                    text1 = f1.read()
+                iterative = json.loads(text1)
+
+            except json.JSONDecodeError as e:
+                print("Invalid JSON")
+                print(e)
+                print("found:")
+                print(text1)
+                return
+            return iterative.get("packed")
+        else:
+            print("for input:")
+            print(input)
+            print("Error: Result file not found.")
+
+    except subprocess.CalledProcessError as e:
+        print(f"An error occurred while running the program: {e}")
+    finally:
+        if os.path.exists(outfile_iterative):
+            os.remove(outfile_iterative)
+        if remove_input:
+            if os.path.exists(input):
+                os.remove(input)        
+
+def evaluateNumber(PACKER, RESULTS, OUTPUT_JSON, inputs, tests):
+    json_rows = []
+    algorithms = 5
+    for algo in range(algorithms):
+        packed = 0
+        for i in range(tests):
+            packed += numberOfPacked(str(PACKER), algo, inputs[i], str(RESULTS)) 
+        packed = packed / tests
+        row = { "algorithm": algo, "samples": tests, "avg_packed": packed }
+        json_rows.append(row)
+
+        print(f"Algo {algo}: {packed}")
+
+    with open(OUTPUT_JSON, "w") as file:
+        json.dump(json_rows, file, indent=4)
+
+    print(f"results written to: {OUTPUT_JSON}")
+
+def main():
+    PROJECT_ROOT = Path(__file__).resolve().parent.parent
+    PACKER = PROJECT_ROOT / "Packing_cpp" / "packer"
+    DATASET = PROJECT_ROOT / "data" / "generated_items.csv"
+    TARGETFOLDER = PROJECT_ROOT / "data"
+    PACKER = PROJECT_ROOT / "Packing_cpp" / "packer.exe"
+    RESULTS = PROJECT_ROOT / "results"
+    OUTPUT_JSON = PROJECT_ROOT / "results/comparison.json"
+
+    # print(f"Project Root: {PROJECT_ROOT}")
+    # print(f"Program Path: {PACKER}")
+
+    tests = 10000
+    inputs = generate_inputs(str(DATASET), str(TARGETFOLDER), tests, 15, 43500)
+
+    print("inputs generated")
+
+    evaluateNumber(PACKER, RESULTS, OUTPUT_JSON, inputs, tests)
+    # evaluateComparison(PACKER, RESULTS, OUTPUT_JSON, inputs, tests)
+ 
 
 
 if __name__ == "__main__":

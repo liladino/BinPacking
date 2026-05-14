@@ -1,9 +1,7 @@
 def sort_by_volume_desc(items):
-    # Volume = x * y * z
     return sorted(items, key=lambda item: item[0] * item[1] * item[2], reverse=True)
 
 def sort_by_largest_face_desc(items):
-    # Largest face area = product of two largest edges
     def max_face_area(item):
         dims = sorted(item, reverse=True)
         return dims[0] * dims[1]

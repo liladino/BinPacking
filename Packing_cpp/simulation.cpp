@@ -24,7 +24,7 @@ struct trio{
 	T1 first; T2 second; T3 third;
 };
 
-void incrementalAlgo(Packer* packer, size_t items[], size_t n, const std::string& outfile, const std::string& visualExp = ""){
+void incrementalAlgo(Packer* packer, size_t items[], size_t n, std::ostream* outfile, const std::string& visualExp = ""){
 	std::vector<trio<size_t, size_t, std::string>> results;
 	std::vector<std::string> visuals;
 	for (size_t chainIndex = 0; chainIndex < chains.size(); chainIndex++){
@@ -90,7 +90,7 @@ void incrementalAlgo(Packer* packer, size_t items[], size_t n, const std::string
 }
 
 //finds the minimal bin needed for given input without incremental algorithm
-void firstFitAlgo(Packer* packer, size_t items[], size_t n, const std::string& outfile, const std::string& visualExp = ""){
+void firstFitAlgo(Packer* packer, size_t items[], size_t n, std::ostream* outfile, const std::string& visualExp = ""){
 	std::vector<std::pair<std::string, Vec3>> limitsVector;
 	std::for_each(limits.begin(), limits.end(), 
 		[&](auto x){ 
@@ -101,9 +101,9 @@ void firstFitAlgo(Packer* packer, size_t items[], size_t n, const std::string& o
 			return l.second[0] * l.second[1] * l.second[2] < r.second[0] * r.second[1] * r.second[2];
 		});
 
-	for (auto x : limitsVector){ 
-		std::cout << x.first << ' ';
-	}
+	// for (auto x : limitsVector){ 
+	// 	std::cout << x.first << ' ';
+	// }
 	
 	std::vector<trio<size_t, size_t, std::string>> results;
 
@@ -145,7 +145,7 @@ void firstFitAlgo(Packer* packer, size_t items[], size_t n, const std::string& o
 	}
 }
 
-void simulate(size_t algorithm, size_t items[], size_t n, const std::string& outfile, bool firstFit, const std::string& visualExp){
+void simulate(size_t algorithm, size_t items[], size_t n, std::ostream* outfile, bool firstFit, const std::string& visualExp){
 	if (algorithm < 4){
 		GreedyPacker greedy;
 		switch (algorithm){

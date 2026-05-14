@@ -75,16 +75,9 @@ void exportPackingToJSON(const std::string& JSON, const std::string& outfile){
 	data.close();
 }
 
-size_t importItems(const std::string& infile, std::vector<size_t>& items){
-	std::ifstream data(infile);
-
-	if (!data.is_open()){
-		std::cerr << "Couldn't open file " << infile << std::endl;
-		return 0;
-	}
-	
+size_t importItems(std::istream* is, std::vector<size_t>& items){
 	size_t x;
-	while (data >> x){
+	while (*is >> x){
 		items.push_back(x);
 	}
 
@@ -97,7 +90,6 @@ size_t importItems(const std::string& infile, std::vector<size_t>& items){
 	// }
 	// std::cout << std::endl;
 
-	data.close();
 	return items.size()/3;
 }
 
@@ -111,7 +103,7 @@ std::string metaDataToJSON(const std::string& neededBin, size_t allItems, Packer
 		"min_leftover_slack": 1,
 		"sum_leftover_slack": 1,
 		"max_leftover_slack": 1,
-		"bounding_box_volume": 0.8
+		"bounding_box_volume_ratio": 0.8
 	}
 	*/
 	std::stringstream ss;
@@ -130,22 +122,19 @@ std::string metaDataToJSON(const std::string& neededBin, size_t allItems, Packer
 	ss << "\t" << jsonData("min_leftover_slack", packer->getMinLeftoverSlack()) << ",\n";
 	ss << "\t" << jsonData("sum_leftover_slack", packer->getSumLeftoverSlack(false)) << ",\n";
 	ss << "\t" << jsonData("max_leftover_slack", packer->getMaxLeftoverSlack(false)) << ",\n";
-	ss << "\t" << jsonData("bounding_box_volume", packer->getBoundingBoxVolumeRatio(false)) << "\n";
+	ss << "\t" << jsonData("bounding_box_volume_ratio", packer->getBoundingBoxVolumeRatio(false)) << "\n";
 	ss << "}";
 	
 	return ss.str();
 }
 
 
-void writeMetaData(const std::string& outfile, const std::string& data){
-	std::ofstream f(outfile);
-	if (!f.is_open()){
-		std::cerr << "Couldn't open file " << outfile << std::endl;
-		return;
-	}
-	f << data;
-
+void writeMetaData(std::ostream* outfile, const std::string& data){
+	// if (!outfile->is_open()){
+	// 	std::cerr << "Couldn't open file " << outfile << std::endl;
+	// 	return;
+	// }
+	*outfile << data;
 	// std::cerr << data << std::endl;
-
-	f.close();
+	// f.close();
 }

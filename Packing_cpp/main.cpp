@@ -16,12 +16,7 @@ enum class Command{
 // cd Packing_cpp/; make all; cd ..
 // ./Packing_cpp/packer.exe -i "data/items00001.txt" -o "results/output.json"
 int main(int argc, char *argv[]) {
-	if (argc < 2){
-		std::cerr << "No input specified" << std::endl;
-		return 0;
-	}
-
-	string infile = "", outfile = "output.json", visual = "";
+	string inputFilePath = "", outputFilePath = "", visual = "";
 	int alg = 0;
 	bool firstFit = false, argVisual = false;
 	Command lastComm = Command::Other; 
@@ -44,10 +39,10 @@ int main(int argc, char *argv[]) {
 		}
 		else {
 			if (Command::Input == lastComm) {
-				infile = argv[i];
+				inputFilePath = argv[i];
 			}
 			else if (Command::Output == lastComm) {
-				outfile = argv[i];
+				outputFilePath = argv[i];
 			} 
 			else if (Command::Algo == lastComm) {
 				alg = stoi(argv[i]);
@@ -58,23 +53,55 @@ int main(int argc, char *argv[]) {
 			lastComm = Command::Other;
 		}
 	}
-	if (infile == ""){
-		std::cerr << "No input specified" << std::endl;
-		return 0;
+	//inputs
+	std::ifstream inFile;
+    std::istream* inputStream = nullptr;
+	if (inputFilePath == ""){
+		inputStream = &std::cin;
 	}
+	else {
+		inFile.open(inputFilePath);
+		if (!inFile.is_open()){
+			std::cerr << "Couldn't open file " << inputFilePath << std::endl;
+			return 1;
+		}
+		inputStream = &inFile;
+	}
+
+	// output
+	std::ofstream outFile;
+    std::ostream* outputStream = nullptr;
+	if (outputFilePath == ""){
+		outputStream = &std::cout;
+	}
+	else {
+		outFile.open(outputFilePath);
+		if (!outFile.is_open()){
+			std::cerr << "Couldn't open file " << outputFilePath << std::endl;
+			return 1;
+		}
+		outputStream = &outFile;
+	}
+
 	if ("" == visual && argVisual){
-		//visuals, but no file specified
+		//visuals requested, but no file specified
 		visual = "data.json";
 	}
 
 	std::vector<size_t> itemsVec;
-	size_t items = importItems(infile, itemsVec); 
+	size_t items = importItems(inputStream, itemsVec); 
+	if (inputStream == &inFile){
+		inFile.close();
+	}
 	if (items == 0){
 		std::cerr << "No items" << std::endl;
-		return 0;
+		return 1;
 	}
 
-	simulate(alg, itemsVec.data(), items, outfile, firstFit, visual);
-	
+	simulate(alg, itemsVec.data(), items, outputStream, firstFit, visual);
+	if (outputStream == &outFile){
+		outFile.close();
+	}
+
 	return 0;
 }

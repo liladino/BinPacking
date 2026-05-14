@@ -14,8 +14,8 @@ void exportPackingToJSON(Packer* packer, const std::string& outfile);
 void exportPackingToJSON(const std::string& JSON, const std::string& outfile);
 
 std::string metaDataToJSON(const std::string& neededBin, size_t allItems, Packer* packer);
-void writeMetaData(const std::string& outfile, const std::string& data);
+void writeMetaData(std::ostream* outfile, const std::string& data);
 
-size_t importItems(const std::string& infile, std::vector<size_t>& items);
+size_t importItems(std::istream* is, std::vector<size_t>& items);
 
 #endif

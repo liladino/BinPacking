@@ -2,6 +2,7 @@ import subprocess
 import json
 import os
 import math
+import config
 from input_gen import generate_random_items
 from pathlib import Path
 
@@ -140,12 +141,13 @@ def numberOfPacked(packer, algorithm, input, results, remove_input = False):
                 print(e)
                 print("found:")
                 print(text1)
-                return
+                return 0
             return iterative.get("packed")
         else:
             print("for input:")
             print(input)
             print("Error: Result file not found.")
+            return 0
 
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while running the program: {e}")
@@ -175,24 +177,19 @@ def evaluateNumber(PACKER, RESULTS, OUTPUT_JSON, inputs, tests):
     print(f"results written to: {OUTPUT_JSON}")
 
 def main():
-    PROJECT_ROOT = Path(__file__).resolve().parent.parent
-    PACKER = PROJECT_ROOT / "Packing_cpp" / "packer"
-    DATASET = PROJECT_ROOT / "data" / "generated_items.csv"
-    TARGETFOLDER = PROJECT_ROOT / "data"
-    PACKER = PROJECT_ROOT / "Packing_cpp" / "packer.exe"
-    RESULTS = PROJECT_ROOT / "results"
-    OUTPUT_JSON = PROJECT_ROOT / "results/comparison.json"
+    TARGETFOLDER = config.PROJECT_ROOT / "data"
+    OUTPUT_JSON = config.PROJECT_ROOT / "results/comparison.json"
 
     # print(f"Project Root: {PROJECT_ROOT}")
     # print(f"Program Path: {PACKER}")
 
     tests = 10000
-    inputs = generate_inputs(str(DATASET), str(TARGETFOLDER), tests, 15, 43500)
+    inputs = generate_inputs(str(config.DATASET), str(TARGETFOLDER), tests, 15, 43500)
 
     print("inputs generated")
 
-    evaluateNumber(PACKER, RESULTS, OUTPUT_JSON, inputs, tests)
-    # evaluateComparison(PACKER, RESULTS, OUTPUT_JSON, inputs, tests)
+    # evaluateNumber(config.PACKER_EXECUTABLE, config.RESULTS_DIR, OUTPUT_JSON, inputs, tests)
+    evaluateComparison(config.PACKER_EXECUTABLE, config.RESULTS_DIR, OUTPUT_JSON, inputs, tests)
  
 
 

@@ -14,7 +14,7 @@ def constrained_random_sample(file_path, max_items, max_volume):
                 items.append(row)
     except FileNotFoundError:
         print(f"{file_path} not found.")
-        return
+        return []
 
     selected_items = []
     current_volume = 0.0

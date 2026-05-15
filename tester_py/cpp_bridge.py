@@ -19,7 +19,7 @@ def run_packer(items, algo_id, is_first_fit=False):
         return output_json
     except subprocess.CalledProcessError as e:
         print(f"Error while running the packer: {e.stderr}")
-        return None
+        raise ValueError({e.stderr})
     except json.JSONDecodeError:
         print(f"Non standard JSON. Raw output:\n{result.stdout}")
         return None

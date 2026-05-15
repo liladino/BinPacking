@@ -13,7 +13,6 @@ BOX_PRICES = {
     "xl": 8350
 }
 
-# Map strings to your C++ algorithm IDs
 ALGORITHMS = {
     "greedy_0": 0,
     "greedy_1": 1,

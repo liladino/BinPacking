@@ -6,13 +6,12 @@ import strategies
 from simulated_ann import run_sa, calculate_cost
 
 def main():
-    num_samples = 50 # Start small for testing
+    num_samples = 5
     all_results = []
 
     for i in range(num_samples):
         print(f"Processing Order {i+1}/{num_samples}...")
         
-        # 1. Generate base data
         rows = constrained_random_sample(str(DATASET), 15, 43500)
         base_items = rows_into_tuples(rows)
         
@@ -22,8 +21,7 @@ def main():
             json_rand = run_packer(base_items, algo_id)
             all_results.append({
                 "sample_id": i, "algo": algo_name, "strategy": "random",
-                "cost": calculate_cost(json_rand), "bin": json_rand["bin_needed"],
-                "packed_count": json_rand["packed"]
+                "cost": calculate_cost(json_rand)
             })
             
             # --- Evaluate Volume Descending ---
@@ -31,8 +29,7 @@ def main():
             json_vol = run_packer(items_vol, algo_id)
             all_results.append({
                 "sample_id": i, "algo": algo_name, "strategy": "volume_desc",
-                "cost": calculate_cost(json_vol), "bin": json_vol["bin_needed"],
-                "packed_count": json_vol["packed"]
+                "cost": calculate_cost(json_vol)
             })
 
             # --- Evaluate Simulated Annealing ---
@@ -40,8 +37,7 @@ def main():
             _, best_sa_cost, best_sa_json = run_sa(items_vol, algo_id, max_iters=200)
             all_results.append({
                 "sample_id": i, "algo": algo_name, "strategy": "sim_anneal",
-                "cost": best_sa_cost, "bin": best_sa_json["bin_needed"],
-                "packed_count": best_sa_json["packed"]
+                "cost": best_sa_cost
             })
 
     # Save to CSV
@@ -52,7 +48,7 @@ def main():
         writer.writeheader()
         writer.writerows(all_results)
         
-    print(f"Done! Results saved to {csv_file}")
+    print(f"Results in {csv_file}")
 
 if __name__ == "__main__":
     main()

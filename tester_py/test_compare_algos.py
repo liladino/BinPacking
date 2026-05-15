@@ -21,7 +21,7 @@ def generate_inputs(dataset, target_folder, number_of_files, max_items, max_volu
             max_items, 
             max_volume, 
             False,
-            False)
+            True)
         output_files.append(file)
     return output_files
 
@@ -39,8 +39,8 @@ def compare_first_fit_iterative(path_first_fit, path_iterative):
         with open(path_first_fit, 'r') as f1, open(path_iterative, 'r') as f2:
             text1 = f1.read()
             text2 = f2.read()
-        first_fit = json.loads(text1)
-        iterative = json.loads(text2)
+        first_fit = json.loads(text1)[0]
+        iterative = json.loads(text2)[0]
 
     except json.JSONDecodeError as e:
         print("Invalid JSON")
@@ -68,9 +68,13 @@ def compare_first_fit_iterative(path_first_fit, path_iterative):
 def runComparison(packer, algorithm, input, results, remove_input = False):
     outfile_iterative = results + "/it.json"
     outfile_first_fit = results + "/ff.json"
+
+    if not os.path.exists(input):
+        print("No input file found")
+        return 0
     
-    args_set_a = ["--input", input, "--algorithm", str(algorithm), "--output", outfile_iterative]
-    args_set_b = ["--input", input, "--algorithm", str(algorithm), "--output", outfile_first_fit, "--firstFit"]
+    args_set_a = ["--input", input, "--algorithm", str(algorithm), "--output", outfile_iterative, "--stopIfDoesntFit"]
+    args_set_b = ["--input", input, "--algorithm", str(algorithm), "--output", outfile_first_fit, "--stopIfDoesntFit", "--firstFit"]
     
     try:
         # output = 
@@ -109,10 +113,12 @@ def evaluateComparison(PACKER, RESULTS, OUTPUT_JSON, inputs, tests):
         results = [0, 0]
 
         for i in range(tests):
-            x = runComparison(str(PACKER), algo, inputs[i], str(RESULTS)) #, (True if algo == algorithms-1 else False))
+            x = runComparison(str(PACKER), algo, inputs[i], str(RESULTS), False) # (True if algo == algorithms-1 else False))
             if x is not None:
                 if x != 0:
                     results[x - 1] += 1
+                # if x == 2:
+                #     print(inputs[i])
 
         row = { "algorithm": algo, "sorted": True, "samples": tests, "first_fit": results[0], "iterative": results[1] }
         json_rows.append(row)
@@ -183,15 +189,13 @@ def main():
     # print(f"Project Root: {PROJECT_ROOT}")
     # print(f"Program Path: {PACKER}")
 
-    tests = 10000
+    tests = 50
     inputs = generate_inputs(str(config.DATASET), str(TARGETFOLDER), tests, 15, 43500)
 
     print("inputs generated")
 
     # evaluateNumber(config.PACKER_EXECUTABLE, config.RESULTS_DIR, OUTPUT_JSON, inputs, tests)
     evaluateComparison(config.PACKER_EXECUTABLE, config.RESULTS_DIR, OUTPUT_JSON, inputs, tests)
- 
-
 
 if __name__ == "__main__":
     main()

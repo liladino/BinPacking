@@ -1,37 +1,51 @@
 import math
 import random
+import copy
 from config import BOX_PRICES
 from cpp_bridge import run_packer
 
 def calculate_cost(json_data):
-    base_price = BOX_PRICES[json_data["bin_needed"]]
-    vol_ratio = json_data["bounding_box_volume"]
-    max_slack = json_data["max_leftover_slack"]
-    
-	#constants
-    c_vol_ratio = 100
-    c_max_slack = 0.1
+    sum_cost = 0
+    for shipment in json_data:
+        base_price = BOX_PRICES[shipment["bin_needed"]]
+        vol_ratio = shipment["bounding_box_volume_ratio"]
+        max_slack = shipment["max_leftover_slack"]
         
-    cost = base_price - \
-           c_vol_ratio * vol_ratio + \
-           c_max_slack * max_slack
+        #constants
+        c_vol_ratio = 100
+        c_max_slack = 0.7
+        
+        sum_cost += base_price - \
+            c_vol_ratio * vol_ratio + \
+            c_max_slack * max_slack
      
-    return cost
+    return sum_cost
 
 def get_neighbor(items):
-    # Swaps two random items -> neighbour state
     new_items = items.copy()
-    idx1, idx2 = random.sample(range(len(new_items)), 2)
-    new_items[idx1], new_items[idx2] = new_items[idx2], new_items[idx1]
+    # pop
+    idx_from = random.randrange(len(new_items))
+    item = new_items.pop(idx_from)
+    # insert
+    idx_to = random.randrange(len(new_items))
+    new_items.insert(idx_to, item)
     return new_items
+
+    # Swaps two random items -> neighbour state 
+    # new_items = items.copy()
+    # idx1, idx2 = random.sample(range(len(new_items)), 2)
+    # new_items[idx1], new_items[idx2] = new_items[idx2], new_items[idx1]
+    # return new_items
 
 def run_sa(initial_items, algo_id, max_iters=500, temp=1000.0, cooling_rate=0.95):
     current_items = initial_items
     current_json = run_packer(current_items, algo_id)
     current_cost = calculate_cost(current_json)
     
-    best_items, best_cost, best_json = current_items, current_cost, current_json
-
+    best_items = current_items.copy()
+    best_cost = current_cost
+    best_json = copy.deepcopy(current_json)
+    
     for i in range(max_iters):
         neighbor = get_neighbor(current_items)
         neighbor_json = run_packer(neighbor, algo_id)

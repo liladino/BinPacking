@@ -14,9 +14,9 @@ BOX_PRICES = {
 }
 
 ALGORITHMS = {
-    "greedy_0": 0,
-    "greedy_1": 1,
-    "greedy_2": 2,
-    "greedy_3": 3,
+    "greedy_no_rotation": 0,
+    "greedy_larges_face_up": 1,
+    "greedy_min_sum_slack": 2,
+    "greedy_first_fit": 3,
     "shelf": 4
 }

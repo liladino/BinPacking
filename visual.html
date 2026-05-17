@@ -75,16 +75,21 @@ async function loadBinData(url) {
 
 loadBinData('results/data.json');
 
+function seededRandom(seed) {
+    const x = Math.sin(seed) * 10000;
+    return x - Math.floor(x);
+}
+
 function addBox(b) {
 	const geometry = new THREE.BoxGeometry(
 		b.w - padding, 
 		b.h - padding, 
 		b.d - padding
 	);
-    // const geometry = new THREE.BoxGeometry(b.w, b.h, b.d);
+    const boxSeed = b.x + b.y + b.z + b.w + b.h + b.d + 109;
 
     const material = new THREE.MeshPhongMaterial({
-        color: (1 - Math.random() ** 3) * 0xffffff,
+        color: (1 - seededRandom(boxSeed) ** 4) * 0xffffff,
         transparent: false,
         // opacity: 0.7,
         // side: THREE.DoubleSide,

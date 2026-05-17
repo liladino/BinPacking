@@ -8,8 +8,8 @@
 
 struct Vec3 {
 	std::array<size_t, 3> coords;
-	Vec3(){ coords = {}; }
-	Vec3(size_t x, size_t y, size_t z){ coords = {x, y, z};}
+	constexpr Vec3() : coords({}) {}
+	constexpr Vec3(size_t x, size_t y, size_t z) : coords({x, y, z}) {}
 	
 	//consts:
 	size_t operator[](size_t index) const{
@@ -20,13 +20,6 @@ struct Vec3 {
 	size_t& operator[](size_t index){
 		return coords[index];
 	}
-
-	// bool operator<(const Vec3& other) const {
-	// 	if (coords[0] != other[0]) return coords[0] < other[0];
-	// 	if (coords[1] != other[1]) return coords[1] < other[1];
-	// 	if (coords[2] != other[2]) return coords[2] < other[2];
-	// 	return false;
-	// }
 };
 
 struct Item {

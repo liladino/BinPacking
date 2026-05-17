@@ -16,7 +16,7 @@ private:
 	/* Calculates the maximum extent of the items in the bin,
 	* assuming that the packing started from the 0, 0, 0 corner
 	*/
-	std::array<size_t, 3> farthestXYZ = {0, 0, 0};
+	Vec3 farthestXYZ = {0, 0, 0};
 	void calculateItemExtent(){
 		farthestXYZ = {0, 0, 0};
 		for (const auto& item : packed){
@@ -92,6 +92,13 @@ public:
 		if (packed.size() == 0) return 0;
 		if (recalculate) calculateItemExtent();
 		return usedVolume() / (double)farthestXYZ[0] / (double)farthestXYZ[1] / (double)farthestXYZ[2];
+	}
+
+	Vec3 getCurrentExtent(bool recalculate = true){
+		if (recalculate || farthestXYZ[0] + farthestXYZ[1] + farthestXYZ[2] == 0){
+			calculateItemExtent();
+		}
+		return farthestXYZ;
 	}
 
 	bool intersects(const Item& a, const Item& b) const {

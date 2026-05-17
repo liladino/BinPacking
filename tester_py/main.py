@@ -31,7 +31,7 @@ def main():
         print(f"Processing batch {i+1}/{num_samples}...")
         
         while True:
-            rows = constrained_random_sample(str(DATASET), random.randint(50, 100), 1e9)#43500)
+            rows = constrained_random_sample(str(DATASET), random.randint(5, 10), 1e9)#43500)
             base_items = rows_into_tuples(rows)
             if len(base_items) > 5:
                 break
@@ -85,7 +85,7 @@ def main():
                     "cost": best_sa_cost
                 })
             except ValueError as e:
-                print(f"{e} in {algo_name} at sample {i}")
+                print(f"{e.stderr} in {algo_name} at sample {i}")
                 print(f"sample: {base_items}, selected rows: {rows}")
                 break
     

@@ -3,6 +3,7 @@ import json
 import os
 import math
 import config
+from config import ALGORITHMS
 from input_gen import generate_random_items
 from pathlib import Path
 
@@ -108,8 +109,7 @@ def runComparison(packer, algorithm, input, results, remove_input = False):
 
 def evaluateComparison(PACKER, RESULTS, OUTPUT_JSON, inputs, tests):
     json_rows = []
-    algorithms = 5
-    for algo in range(algorithms):
+    for name, algo in ALGORITHMS:
         results = [0, 0]
 
         for i in range(tests):
@@ -120,10 +120,10 @@ def evaluateComparison(PACKER, RESULTS, OUTPUT_JSON, inputs, tests):
                 # if x == 2:
                 #     print(inputs[i])
 
-        row = { "algorithm": algo, "sorted": True, "samples": tests, "first_fit": results[0], "iterative": results[1] }
+        row = { "algorithm": name, "sorted": True, "samples": tests, "first_fit": results[0], "iterative": results[1] }
         json_rows.append(row)
 
-        print(f"Algo {algo}:\nfirst fit\t{results[0]}\niterative\t{results[1]}")
+        print(f"Algo {name}:\nfirst fit\t{results[0]}\niterative\t{results[1]}")
 
     with open(OUTPUT_JSON, "w") as file:
         json.dump(json_rows, file, indent=4)

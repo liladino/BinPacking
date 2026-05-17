@@ -18,5 +18,6 @@ ALGORITHMS = {
     "greedy_larges_face_up": 1,
     "greedy_min_sum_slack": 2,
     "greedy_first_fit": 3,
-    "shelf": 4
+    "shelf": 4,
+	"extreme_points": 5
 }

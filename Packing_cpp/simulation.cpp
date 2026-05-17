@@ -163,24 +163,21 @@ std::pair<size_t, std::string> firstFitAlgo(Packer* packer, size_t items[], cons
 	return {packer->getPacked(), meta};
 }
 
-void simulate(size_t algorithm, size_t items[], const size_t n, std::ostream* outfile, bool firstFit, const ShipPolicy shipPolicy, const std::string& visualExp){
+void simulate(Algorithm algorithm, size_t items[], const size_t n, std::ostream* outfile, bool firstFit, const ShipPolicy shipPolicy, const std::string& visualExp){
 	Packer* packer = nullptr;
 	GreedyPacker greedy;
 	ShelfPacker shelf;
+	ExtremePointsPacker epp;
 	
-	if (algorithm < 4){
-		switch (algorithm){
-			case 1: greedy.setPolicy(std::make_unique<RP_largestFaceUp>()); break;
-			case 2: greedy.setPolicy(std::make_unique<RP_minSumLeftoverSlack>()); break;
-			case 3: greedy.setPolicy(std::make_unique<RP_tryFirstFitting>()); break;
-			default: break;
-		}
-		packer = &greedy;
+	switch (algorithm){
+		case Algorithm::GreedyNoRotation: break;
+		case Algorithm::GreedyLargestFaceUp: greedy.setPolicy(std::make_unique<RP_largestFaceUp>()); packer = &greedy; break;
+		case Algorithm::GreedyMinSumLeftoverSlack: greedy.setPolicy(std::make_unique<RP_minSumLeftoverSlack>()); packer = &greedy; break;
+		case Algorithm::GreedyTryFirstFitting:  greedy.setPolicy(std::make_unique<RP_tryFirstFitting>()); packer = &greedy; break;
+		case Algorithm::ShelfLayer: packer = &shelf; break;
+		case Algorithm::ExtremePoints: packer = &epp; break;
 	}
-	else if (algorithm == 4){
-		packer = &shelf;
-	}
-		
+
 	size_t itemID = 0, lastItemID = 0;
 	std::vector<std::string> jsonArray;
 	while (itemID < n){

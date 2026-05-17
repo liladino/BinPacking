@@ -114,7 +114,17 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	simulate(alg, itemsVec.data(), items, outputStream, firstFit, shipPolicy, visual);
+	Algorithm alg_enum;
+	switch (alg){
+		case 0: alg_enum = Algorithm::GreedyNoRotation; break;
+		case 1: alg_enum = Algorithm::GreedyLargestFaceUp; break;
+		case 2: alg_enum = Algorithm::GreedyMinSumLeftoverSlack; break;
+		case 3: alg_enum = Algorithm::GreedyTryFirstFitting; break;
+		case 4: alg_enum = Algorithm::ShelfLayer; break;
+		case 5: alg_enum = Algorithm::ExtremePoints; break;
+	}
+
+	simulate(alg_enum, itemsVec.data(), items, outputStream, firstFit, shipPolicy, visual);
 	if (outputStream == &outFile){
 		outFile.close();
 	}

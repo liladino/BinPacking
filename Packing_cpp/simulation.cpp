@@ -170,7 +170,7 @@ void simulate(Algorithm algorithm, size_t items[], const size_t n, std::ostream*
 	ExtremePointsPacker epp;
 	
 	switch (algorithm){
-		case Algorithm::GreedyNoRotation: break;
+		case Algorithm::GreedyNoRotation: packer = &greedy; break;
 		case Algorithm::GreedyLargestFaceUp: greedy.setPolicy(std::make_unique<RP_largestFaceUp>()); packer = &greedy; break;
 		case Algorithm::GreedyMinSumLeftoverSlack: greedy.setPolicy(std::make_unique<RP_minSumLeftoverSlack>()); packer = &greedy; break;
 		case Algorithm::GreedyTryFirstFitting:  greedy.setPolicy(std::make_unique<RP_tryFirstFitting>()); packer = &greedy; break;

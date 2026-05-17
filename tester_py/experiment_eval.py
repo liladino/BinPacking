@@ -1,9 +1,6 @@
 from pathlib import Path
 import pandas as pd
 
-PROJECT_ROOT = Path(__file__).resolve().parent
-DATA = PROJECT_ROOT / "results" / "experiment_results.csv"
-
 def process_strategy_matrix(input_csv_path, output_csv_path):
     df = pd.read_csv(input_csv_path)
 
@@ -25,10 +22,6 @@ def process_strategy_matrix(input_csv_path, output_csv_path):
     matrix = matrix.reindex(index=all_strategies, columns=all_algos, fill_value=0)
 
     matrix.to_csv(output_csv_path)
-    print(f"Success! Matrix exported to {output_csv_path}")
+    print(f"Result matrix in {output_csv_path}")
     
     return matrix
-
-
-if __name__ == "__main__":
-    process_strategy_matrix(str(DATA), 'strategy_win_matrix.csv')

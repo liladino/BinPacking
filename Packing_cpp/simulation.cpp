@@ -97,7 +97,9 @@ std::pair<size_t, std::string> incrementalAlgo(Packer* packer, size_t items[], c
 	
 	if ("" != visualExp) {
 		exportPackingToJSON(visuals[maxi], visualExp);
-		char c; std::noskipws(std::cin); std::cin >> c;
+		if (ShipPolicy::ShipEverything == shipPolicy && results[maxi].first < n) {
+			char c; std::noskipws(std::cin); std::cin >> c;
+		}
 	}
 	return {results[maxi].first, results[maxi].third};
 }
@@ -141,14 +143,11 @@ std::pair<size_t, std::string> firstFitAlgo(Packer* packer, size_t items[], cons
 			_itemID = packWhileItCan(packer, items, n, _itemID);
 		}
 		
-		// exportPackingToJSON(packer, visualExp);
-		// char c; std::noskipws(std::cin); std::cin >> c;
-
 		if (_itemID == n){
 			auto meta = metaDataToJSON(limitName, n, packer);
 			if ("" != visualExp){
 				exportPackingToJSON(packer, visualExp);
-				char c; std::noskipws(std::cin); std::cin >> c;
+				// char c; std::noskipws(std::cin); std::cin >> c;
 			}
 			return {packer->getPacked(), meta};
 		}
@@ -158,7 +157,9 @@ std::pair<size_t, std::string> firstFitAlgo(Packer* packer, size_t items[], cons
 	auto meta = metaDataToJSON(limitsVector[limitsVector.size()-1].first, n, packer);
 	if ("" != visualExp){
 		exportPackingToJSON(packer, visualExp);
-		char c; std::noskipws(std::cin); std::cin >> c;
+		if (ShipPolicy::ShipEverything == shipPolicy) {
+			char c; std::noskipws(std::cin); std::cin >> c;
+		}
 	}
 	return {packer->getPacked(), meta};
 }

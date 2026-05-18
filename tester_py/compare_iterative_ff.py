@@ -21,15 +21,18 @@ def generate_inputs(dataset, target_folder, number_of_files):
             input_path=dataset, 
             output_path=file, 
             min_items=5, 
-            max_items=random.randint(5, 20), 
-            max_volume=1e9, 
+            max_items=15,
+            max_volume=43500, 
+            # min_items=5, 
+            # max_items=random.randint(5, 20), 
+            # max_volume=1e9, 
             printToStdout=False,
-            sorted=True)
+            sorted=False)
         
         output_files.append(file)
     return output_files
 
-def compare_first_fit_iterative(path_first_fit, path_iterative):
+def compare_first_fit_iterative(first_fit, iterative):
     bin_dict = {
         "xs" : 1,
         "s" : 2,
@@ -37,22 +40,6 @@ def compare_first_fit_iterative(path_first_fit, path_iterative):
         "l" : 4,
         "xl" : 5
     }
-    # temp = input()
-    # print(temp)    
-    try:
-        with open(path_first_fit, 'r') as f1, open(path_iterative, 'r') as f2:
-            text1 = f1.read()
-            text2 = f2.read()
-        first_fit = json.loads(text1)[0]
-        iterative = json.loads(text2)[0]
-
-    except json.JSONDecodeError as e:
-        print("Invalid JSON")
-        print(e)
-        print("found:")
-        print(text1)
-        print(text2)
-        return
     
     # the one that packed more wins
     if (first_fit.get("packed") > iterative.get("packed")):
@@ -61,9 +48,6 @@ def compare_first_fit_iterative(path_first_fit, path_iterative):
     if (first_fit.get("packed") < iterative.get("packed")):
         return 2
 
-    # print(bin_dict[first_fit.get("bin_needed")])
-    # print(bin_dict[iterative.get("bin_needed")])
-
     # the one that used a smaller container wins
     if (bin_dict[first_fit.get("bin_needed")] < bin_dict[iterative.get("bin_needed")]):
         return 1
@@ -71,23 +55,23 @@ def compare_first_fit_iterative(path_first_fit, path_iterative):
         return 2
     
     # the one with the smaller bounding box wins (ratio = volume/bounding_box)
-    if (first_fit.get("bounding_box_volume_ratio") > iterative.get("bounding_box_volume_ratio")):
-        return 1
-    if (first_fit.get("bounding_box_volume_ratio") < iterative.get("bounding_box_volume_ratio")):
-        return 2
+    # if (first_fit.get("bounding_box_volume_ratio") > iterative.get("bounding_box_volume_ratio")):
+    #     return 1
+    # if (first_fit.get("bounding_box_volume_ratio") < iterative.get("bounding_box_volume_ratio")):
+    #     return 2
     
     return 0
 
-def runComparison(packer, algorithm, input, results, remove_input = False):
+def runComparison(packer, algorithm, input_file, results, remove_input = False):
     outfile_iterative = results + "/it.json"
     outfile_first_fit = results + "/ff.json"
 
-    if not os.path.exists(input):
+    if not os.path.exists(input_file):
         print("No input file found")
-        return 0
+        return None
     
-    args_set_a = ["--input", input, "--algorithm", str(algorithm), "--output", outfile_iterative, "--skipIfDoesntFit"]
-    args_set_b = ["--input", input, "--algorithm", str(algorithm), "--output", outfile_first_fit, "--skipIfDoesntFit", "--firstFit"]
+    args_set_a = ["--input", input_file, "--algorithm", str(algorithm), "--output", outfile_iterative, "--skipIfDoesntFit"]
+    args_set_b = ["--input", input_file, "--algorithm", str(algorithm), "--output", outfile_first_fit, "--skipIfDoesntFit", "--firstFit"]
     
     try:
         # output = 
@@ -98,95 +82,75 @@ def runComparison(packer, algorithm, input, results, remove_input = False):
         # print(output)
 
         if os.path.exists(outfile_iterative) and os.path.exists(outfile_first_fit):
-            return compare_first_fit_iterative(outfile_first_fit, outfile_iterative)
-        else:
-            print("for input:")
-            print(input)
-            if os.path.exists(outfile_iterative):
-                print("Error: First fit result file not found.")
-            elif os.path.exists(outfile_first_fit):
-                print("Error: Iterative result file not found.")
-            else:
-                print("Error: No result file not found.")
-
-    except subprocess.CalledProcessError as e:
-        print(f"An error occurred while running the program: {e}")
-    finally:
-        for f in [outfile_iterative, outfile_first_fit]:
-            if os.path.exists(f):
-                os.remove(f)
-        if remove_input:
-            if os.path.exists(input):
-                os.remove(input) 
-
-def evaluateComparison(PACKER, RESULTS, OUTPUT_JSON, inputs, tests):
-    json_rows = []
-    for name, algo in ALGORITHMS.items():
-        results = [0, 0]
-
-        for i in range(tests):
-            x = runComparison(str(PACKER), algo, inputs[i], str(RESULTS), False) # (True if algo == algorithms-1 else False))
-            if x is not None:
-                if x != 0:
-                    results[x - 1] += 1
-                # if x == 2:
-                #     print(inputs[i])
-
-        row = { "algorithm": name, "sorted": True, "samples": tests, "first_fit": results[0], "iterative": results[1] }
-        json_rows.append(row)
-
-        print(f"Algo {name}:\nfirst fit\t{results[0]}\niterative\t{results[1]}")
-
-    with open(OUTPUT_JSON, "w") as file:
-        json.dump(json_rows, file, indent=4)
-
-    print(f"results written to: {OUTPUT_JSON}")
-
-def numberOfPacked(packer, algorithm, input, results, remove_input = False):
-    outfile_iterative = results + "/it.json"
-    args_set = ["--input", input, "--algorithm", str(algorithm), "--output", outfile_iterative]
-    try: 
-        subprocess.run([packer] + args_set, capture_output=True, text=True)
-        
-        if os.path.exists(outfile_iterative):
             try:
-                with open(outfile_iterative, 'r') as f1:
+                with open(outfile_first_fit, 'r') as f1, open(outfile_iterative, 'r') as f2:
                     text1 = f1.read()
-                iterative = json.loads(text1)
-
+                    text2 = f2.read()
+                first_fit = json.loads(text1)[0]
+                iterative = json.loads(text2)[0]
             except json.JSONDecodeError as e:
                 print("Invalid JSON")
                 print(e)
                 print("found:")
                 print(text1)
-                return 0
-            return iterative.get("packed")
+                print(text2)
+                return None
+
+            winner = compare_first_fit_iterative(first_fit, iterative)
+            return winner, first_fit.get("packed", 0), iterative.get("packed", 0)
         else:
-            print("for input:")
-            print(input)
-            print("Error: Result file not found.")
-            return 0
+            print(f"for input: {input_file}")
+            if os.path.exists(outfile_iterative):
+                print("Error: First fit result file not found.")
+            elif os.path.exists(outfile_first_fit):
+                print("Error: Iterative result file not found.")
+            else:
+                print("Error: No result file found.")
+            return None
 
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while running the program: {e}")
+        return None
     finally:
-        if os.path.exists(outfile_iterative):
-            os.remove(outfile_iterative)
-        if remove_input:
-            if os.path.exists(input):
-                os.remove(input)        
+        for f in [outfile_iterative, outfile_first_fit]:
+            if os.path.exists(f):
+                os.remove(f)
+        if remove_input and os.path.exists(input_file):
+            os.remove(input_file) 
 
-def evaluateNumber(PACKER, RESULTS, OUTPUT_JSON, inputs, tests):
+def evaluateComparison(PACKER, RESULTS, OUTPUT_JSON, inputs, tests):
     json_rows = []
     for name, algo in ALGORITHMS.items():
-        packed = 0
+        ff_dominant = 0
+        it_dominant = 0
+        ff_total_packed = 0
+        it_total_packed = 0
+
         for i in range(tests):
-            packed += numberOfPacked(str(PACKER), algo, inputs[i], str(RESULTS)) 
-        packed = packed / tests
-        row = { "algorithm": algo, "samples": tests, "avg_packed": packed }
+            res = runComparison(str(PACKER), algo, inputs[i], str(RESULTS), False)
+            if res is not None:
+                winner, ff_packed, it_packed = res
+                ff_total_packed += ff_packed
+                it_total_packed += it_packed
+                
+                if winner == 1:
+                    ff_dominant += 1
+                elif winner == 2:
+                    it_dominant += 1
+
+        ff_avg = ff_total_packed / tests
+        it_avg = it_total_packed / tests
+
+        row = { 
+            "algorithm": name, 
+            "sorted": True, 
+            "samples": tests, 
+            "first_fit": [{ "dominant": ff_dominant, "avg_packed": ff_avg }], 
+            "iterative": [{ "dominant": it_dominant, "avg_packed": it_avg }] 
+        }
         json_rows.append(row)
 
-        print(f"Algo {name}: {packed}")
+        print(f"Algo {name}:\nfirst fit\tdominant: {ff_dominant}\tavg packed: {ff_avg:.2f}\niterative\tdominant: {it_dominant}\tavg packed: {it_avg:.2f}")
 
     with open(OUTPUT_JSON, "w") as file:
         json.dump(json_rows, file, indent=4)
@@ -197,15 +161,10 @@ def main():
     TARGETFOLDER = config.PROJECT_ROOT / "data"
     OUTPUT_JSON = config.PROJECT_ROOT / "results/comparison.json"
 
-    # print(f"Project Root: {PROJECT_ROOT}")
-    # print(f"Program Path: {PACKER}")
-
-    tests = 50
+    tests = 99
     inputs = generate_inputs(str(config.DATASET), str(TARGETFOLDER), tests)
 
     print("inputs generated")
-
-    # evaluateNumber(config.PACKER_EXECUTABLE, config.RESULTS_DIR, OUTPUT_JSON, inputs, tests)
     evaluateComparison(config.PACKER_EXECUTABLE, config.RESULTS_DIR, OUTPUT_JSON, inputs, tests)
 
 if __name__ == "__main__":

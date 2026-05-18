@@ -35,6 +35,13 @@ def constrained_random_sample(file_path, max_items, max_volume):
 
     return selected_items
 
+def constrained_random_sample2(file_path, min_items, max_items, max_volume):
+    while True:
+        rows = constrained_random_sample(file_path, max_items, max_volume)
+        if len(rows) >= min_items:
+            break
+    return rows
+
 def rows_into_tuples(rows):
     items = []
     for row in rows:
@@ -65,8 +72,8 @@ def write_items_into_file(items, output_path):
                 line = f"{items[j]},{items[j+1]},{items[j+2]}\n"
                 f.write(line)
 
-def generate_random_items(input_path, output_path="", max_items=15, max_volume=43500, printToStdout=True, sorted=False):
-    result = constrained_random_sample(input_path, max_items, max_volume)
+def generate_random_items(input_path, output_path="", *, min_items=0, max_items=15, max_volume=43500, printToStdout=True, sorted=False):
+    result = constrained_random_sample2(input_path, min_items, max_items, max_volume)
 
     if not result:
         if printToStdout:
@@ -111,7 +118,7 @@ def main():
 
     args = parser.parse_args()
 
-    generate_random_items(args.input, args.output, args.max_items, args.max_volume, True)
+    generate_random_items(args.input, output_path=args.output, min_items=1, max_items=args.max_items, max_volume=args.max_volume, printToStdout=True)
     
 if __name__ == "__main__":
     main()

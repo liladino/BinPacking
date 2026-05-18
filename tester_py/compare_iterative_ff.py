@@ -1,3 +1,4 @@
+import random
 import subprocess
 import json
 import os
@@ -7,7 +8,7 @@ from config import ALGORITHMS
 from input_gen import generate_random_items
 from pathlib import Path
 
-def generate_inputs(dataset, target_folder, number_of_files, max_items, max_volume):
+def generate_inputs(dataset, target_folder, number_of_files):
     output_files = []
     for i in range(number_of_files):
         file = target_folder + "/items" + str(i).zfill(int(math.log10(number_of_files)+1)) + ".txt" 
@@ -17,12 +18,14 @@ def generate_inputs(dataset, target_folder, number_of_files, max_items, max_volu
             continue
 
         generate_random_items(
-            dataset, 
-            file, 
-            max_items, 
-            max_volume, 
-            False,
-            True)
+            input_path=dataset, 
+            output_path=file, 
+            min_items=5, 
+            max_items=random.randint(5, 20), 
+            max_volume=1e9, 
+            printToStdout=False,
+            sorted=True)
+        
         output_files.append(file)
     return output_files
 
@@ -51,6 +54,7 @@ def compare_first_fit_iterative(path_first_fit, path_iterative):
         print(text2)
         return
     
+    # the one that packed more wins
     if (first_fit.get("packed") > iterative.get("packed")):
         return 1
     
@@ -60,10 +64,18 @@ def compare_first_fit_iterative(path_first_fit, path_iterative):
     # print(bin_dict[first_fit.get("bin_needed")])
     # print(bin_dict[iterative.get("bin_needed")])
 
+    # the one that used a smaller container wins
     if (bin_dict[first_fit.get("bin_needed")] < bin_dict[iterative.get("bin_needed")]):
         return 1
     if (bin_dict[first_fit.get("bin_needed")] > bin_dict[iterative.get("bin_needed")]):
         return 2
+    
+    # the one with the smaller bounding box wins (ratio = volume/bounding_box)
+    if (first_fit.get("bounding_box_volume_ratio") > iterative.get("bounding_box_volume_ratio")):
+        return 1
+    if (first_fit.get("bounding_box_volume_ratio") < iterative.get("bounding_box_volume_ratio")):
+        return 2
+    
     return 0
 
 def runComparison(packer, algorithm, input, results, remove_input = False):
@@ -74,8 +86,8 @@ def runComparison(packer, algorithm, input, results, remove_input = False):
         print("No input file found")
         return 0
     
-    args_set_a = ["--input", input, "--algorithm", str(algorithm), "--output", outfile_iterative, "--stopIfDoesntFit"]
-    args_set_b = ["--input", input, "--algorithm", str(algorithm), "--output", outfile_first_fit, "--stopIfDoesntFit", "--firstFit"]
+    args_set_a = ["--input", input, "--algorithm", str(algorithm), "--output", outfile_iterative, "--skipIfDoesntFit"]
+    args_set_b = ["--input", input, "--algorithm", str(algorithm), "--output", outfile_first_fit, "--skipIfDoesntFit", "--firstFit"]
     
     try:
         # output = 
@@ -109,7 +121,7 @@ def runComparison(packer, algorithm, input, results, remove_input = False):
 
 def evaluateComparison(PACKER, RESULTS, OUTPUT_JSON, inputs, tests):
     json_rows = []
-    for name, algo in ALGORITHMS:
+    for name, algo in ALGORITHMS.items():
         results = [0, 0]
 
         for i in range(tests):
@@ -166,8 +178,7 @@ def numberOfPacked(packer, algorithm, input, results, remove_input = False):
 
 def evaluateNumber(PACKER, RESULTS, OUTPUT_JSON, inputs, tests):
     json_rows = []
-    algorithms = 5
-    for algo in range(algorithms):
+    for name, algo in ALGORITHMS.items():
         packed = 0
         for i in range(tests):
             packed += numberOfPacked(str(PACKER), algo, inputs[i], str(RESULTS)) 
@@ -175,7 +186,7 @@ def evaluateNumber(PACKER, RESULTS, OUTPUT_JSON, inputs, tests):
         row = { "algorithm": algo, "samples": tests, "avg_packed": packed }
         json_rows.append(row)
 
-        print(f"Algo {algo}: {packed}")
+        print(f"Algo {name}: {packed}")
 
     with open(OUTPUT_JSON, "w") as file:
         json.dump(json_rows, file, indent=4)
@@ -190,7 +201,7 @@ def main():
     # print(f"Program Path: {PACKER}")
 
     tests = 50
-    inputs = generate_inputs(str(config.DATASET), str(TARGETFOLDER), tests, 15, 43500)
+    inputs = generate_inputs(str(config.DATASET), str(TARGETFOLDER), tests)
 
     print("inputs generated")
 

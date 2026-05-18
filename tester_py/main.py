@@ -1,7 +1,7 @@
 import argparse
 import csv
 import random
-from input_gen import constrained_random_sample, rows_into_tuples
+from input_gen import constrained_random_sample2, rows_into_tuples
 from config import DATASET, ALGORITHMS, RESULTS_DIR
 from cpp_bridge import run_packer
 import strategies
@@ -30,13 +30,9 @@ def main():
     for i in range(num_samples):
         print(f"Processing batch {i+1}/{num_samples}...")
         
-        while True:
-            rows = constrained_random_sample(str(DATASET), random.randint(5, 10), 1e9)#43500)
-            base_items = rows_into_tuples(rows)
-            if len(base_items) > 5:
-                break
-
-        
+        rows = constrained_random_sample2(str(DATASET), 5, random.randint(5, 10), 1e9)
+        base_items = rows_into_tuples(rows)
+                
         for algo_name, algo_id in ALGORITHMS.items():
             try:
                 # Random sorrend

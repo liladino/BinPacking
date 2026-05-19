@@ -10,7 +10,6 @@ class Vec3
 abstract Packer {
     setLimits()
     setPolicy()
-    intersects(Item b, Item b) : bool
     intersectsAny(Item toPack) : bool
     fitsWithinLimits(Item toPack) : bool
     volume() : int
@@ -22,6 +21,16 @@ class GreedyPacker {
     pack(Item toPack)
 }
 
+class ExtremePointsPacker {
+    pack(Item toPack)
+}
+
+class ShelfPacker {
+    pack(Item toPack)
+}
+
+class Shelf2D {}
+
 interface IRotationPolicy {
     {abstract} rotateBin(Item toPack, Vec3 binSize)
 }
@@ -31,9 +40,12 @@ class RP_minLeftoverSlack
 class RP_tryFirstFitting
 
 Packer <|--GreedyPacker
-Packer *-right- IRotationPolicy
+Packer <|--ExtremePointsPacker
+Packer <|--ShelfPacker
+ShelfPacker *-- Shelf2D
+GreedyPacker *-- IRotationPolicy
 IRotationPolicy <|-- RP_largestFaceUp
-IRotationPolicy <|-- RP_minLeftoverSlack
+IRotationPolicy <|-- RP_minSumLeftoverSlack
 IRotationPolicy <|-- RP_tryFirstFitting
 
 @enduml

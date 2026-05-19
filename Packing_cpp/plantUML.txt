@@ -5,8 +5,6 @@ class Item{
     volume() : int
 }
 
-class Vec3
-
 abstract Packer {
     setLimits()
     setPolicy()
@@ -14,19 +12,19 @@ abstract Packer {
     fitsWithinLimits(Item toPack) : bool
     volume() : int
     usedVolume() : int
-    {abstract} pack(Item toPack)
+    {abstract} pack(Item& toPack)
 }
 
 class GreedyPacker {
-    pack(Item toPack)
+    pack(Item& toPack)
 }
 
 class ExtremePointsPacker {
-    pack(Item toPack)
+    pack(Item& toPack)
 }
 
 class ShelfPacker {
-    pack(Item toPack)
+    pack(Item& toPack)
 }
 
 class Shelf2D {}
@@ -36,12 +34,13 @@ interface IRotationPolicy {
 }
 
 class RP_largestFaceUp
-class RP_minLeftoverSlack
+class RP_minSumLeftoverSlack
 class RP_tryFirstFitting
 
 Packer <|--GreedyPacker
 Packer <|--ExtremePointsPacker
 Packer <|--ShelfPacker
+Packer o-left- Item
 ShelfPacker *-- Shelf2D
 GreedyPacker *-- IRotationPolicy
 IRotationPolicy <|-- RP_largestFaceUp

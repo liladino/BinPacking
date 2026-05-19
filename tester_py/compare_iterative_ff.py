@@ -21,11 +21,8 @@ def generate_inputs(dataset, target_folder, number_of_files):
             input_path=dataset, 
             output_path=file, 
             min_items=5, 
-            max_items=15,
-            max_volume=43500, 
-            # min_items=5, 
-            # max_items=random.randint(5, 20), 
-            # max_volume=1e9, 
+            max_items=random.randint(5, 20), 
+            max_volume=1e9, 
             printToStdout=False,
             sorted=False)
         
@@ -70,8 +67,8 @@ def runComparison(packer, algorithm, input_file, results, remove_input = False):
         print("No input file found")
         return None
     
-    args_set_a = ["--input", input_file, "--algorithm", str(algorithm), "--output", outfile_iterative, "--skipIfDoesntFit"]
-    args_set_b = ["--input", input_file, "--algorithm", str(algorithm), "--output", outfile_first_fit, "--skipIfDoesntFit", "--firstFit"]
+    args_set_a = ["--input", input_file, "--algorithm", str(algorithm), "--output", outfile_iterative, "--stopIfDoesntFit"]
+    args_set_b = ["--input", input_file, "--algorithm", str(algorithm), "--output", outfile_first_fit, "--stopIfDoesntFit", "--firstFit"]
     
     try:
         # output = 
@@ -136,6 +133,7 @@ def evaluateComparison(PACKER, RESULTS, OUTPUT_JSON, inputs, tests):
                 if winner == 1:
                     ff_dominant += 1
                 elif winner == 2:
+                    # print(inputs[i])
                     it_dominant += 1
 
         ff_avg = ff_total_packed / tests
@@ -161,7 +159,7 @@ def main():
     TARGETFOLDER = config.PROJECT_ROOT / "data"
     OUTPUT_JSON = config.PROJECT_ROOT / "results/comparison.json"
 
-    tests = 99
+    tests = 10000
     inputs = generate_inputs(str(config.DATASET), str(TARGETFOLDER), tests)
 
     print("inputs generated")

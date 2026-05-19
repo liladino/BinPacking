@@ -30,7 +30,7 @@ def main():
     for i in range(num_samples):
         print(f"Processing batch {i+1}/{num_samples}...")
         
-        rows = constrained_random_sample2(str(DATASET), 5, random.randint(5, 10), 1e9)
+        rows = constrained_random_sample2(str(DATASET), 5, random.randint(5, 25), 1e9)
         base_items = rows_into_tuples(rows)
                 
         for algo_name, algo_id in ALGORITHMS.items():
@@ -74,10 +74,31 @@ def main():
                     "cost": calculate_cost(json_vol)
                 })
 
-                # Szimulalt hules
+                # Szimulalt hules 100 iter csokkeno sorr
                 _, best_sa_cost, best_sa_json = run_sa(items_vol, algo_id, max_iters=100)
                 all_results.append({
-                    "sample_id": i, "algo": algo_name, "strategy": "sim_anneal",
+                    "sample_id": i, "algo": algo_name, "strategy": "sim_anneal_100_desc",
+                    "cost": best_sa_cost
+                })
+
+                # Szimulalt hules 10 iter csokkeno sorr
+                _, best_sa_cost, best_sa_json = run_sa(items_vol, algo_id, max_iters=10)
+                all_results.append({
+                    "sample_id": i, "algo": algo_name, "strategy": "sim_anneal_10_desc",
+                    "cost": best_sa_cost
+                })
+
+                # Szimulalt hules 100 iter random sorr
+                _, best_sa_cost, best_sa_json = run_sa(base_items, algo_id, max_iters=100)
+                all_results.append({
+                    "sample_id": i, "algo": algo_name, "strategy": "sim_anneal_100_rand",
+                    "cost": best_sa_cost
+                })
+
+                # Szimulalt hules 10 iter random sorr
+                _, best_sa_cost, best_sa_json = run_sa(base_items, algo_id, max_iters=10)
+                all_results.append({
+                    "sample_id": i, "algo": algo_name, "strategy": "sim_anneal_10_rand",
                     "cost": best_sa_cost
                 })
             except ValueError as e:

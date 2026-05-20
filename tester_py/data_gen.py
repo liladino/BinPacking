@@ -22,19 +22,19 @@ CATEGORY_WEIGHTS = {
     "large": 0.05,
 }
 
-def sample_dimension(mean, std_fraction):
-    std = mean * std_fraction
+def sample_dimension(mean, delta):
+    std = mean * delta
     value = np.random.normal(mean, std)
 
     return max(1.0, value) # at least 1cm 
 
 
 def generate_item(category_name, item_id):
-    mean_l, mean_w, mean_h, std_frac = CATEGORIES[category_name]
+    mean_l, mean_w, mean_h, delta = CATEGORIES[category_name]
 
-    l = sample_dimension(mean_l, std_frac)
-    w = sample_dimension(mean_w, std_frac)
-    h = sample_dimension(mean_h, std_frac)
+    l = sample_dimension(mean_l, delta)
+    w = sample_dimension(mean_w, delta)
+    h = sample_dimension(mean_h, delta)
 
     dims = [l, w, h]
     random.shuffle(dims)

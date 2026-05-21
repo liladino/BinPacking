@@ -101,7 +101,8 @@ def generate_random_items(input_path, output_path="", *, min_items=0, max_items=
     output_text = "\n".join(lines)
 
     if printToStdout:
-        print(output_text)
+        if (len(output_text) < 150):
+            print(output_text)
         print(f"Sum volume: {sum_volume}")
 
     if output_path:
@@ -115,6 +116,7 @@ def main():
     parser.add_argument("-o", "--output", default="", help="Output file. Only stdout, if not specified.")
     parser.add_argument("--max-items", type=int, default=15, help="Maximum number of items")
     parser.add_argument("--max-volume", type=float, default=43500, help="Maximum total volume")
+    parser.add_argument("--sorted", type=bool, default=False, help="soert the items into decreasing order by volume")
 
     args = parser.parse_args()
 

@@ -9,6 +9,9 @@ std::map<std::string, Vec3> limits =
 	{"m",  {500, 300, 140}},
 	{"l",  {500, 300, 290}},
 	{"xl", {600, 500, 320}}
+	// {"EUR6", {800, 600, 2200}},
+	// {"EUR1", {1200, 800, 2200}},
+	// {"EUR2", {1200, 1200, 2200}}
 };
 
 std::vector<std::vector<std::string>> chains = 
@@ -16,6 +19,7 @@ std::vector<std::vector<std::string>> chains =
 	// {"test1", "test2"},
 	{"xs", "m", "l", "xl"},
 	{"s",  "m", "l", "xl"}
+	// {"EUR6","EUR1","EUR2"}
 };
 
 template <typename T1, typename T2, typename T3> 

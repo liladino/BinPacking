@@ -114,7 +114,7 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	Algorithm alg_enum;
+	Algorithm alg_enum  = Algorithm::GreedyNoRotation;
 	switch (alg){
 		case 0: alg_enum = Algorithm::GreedyNoRotation; break;
 		case 1: alg_enum = Algorithm::GreedyLargestFaceUp; break;

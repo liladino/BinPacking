@@ -61,9 +61,11 @@ dkms.conf
 build/
 
 #test data
-*.csv
+data/*.csv
+*.png
 
 #cache
 __pycache__
 *.pyc
 ~$*
+.~lock*

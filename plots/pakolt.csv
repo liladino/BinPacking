@@ -1,0 +1,52 @@
+	mintabemenetek								
+	10000								
+
+tárgyak sorrendje	csökkenő térfogat
+max tárgyak	15
+max térfogat (cm^3)	43500
+policy	skip if doesn't fit
+
+		first fit	iterative	egyenlő	iteratív átlag bepakolt			
+0	m. nincs forgatás	164	129	9707	10,4043			
+1	m. largest face up	59	46	9895	10,8821			
+2	m. min slack	318	194	9488	10,8953			
+3	m. first fit	285	271	9444	10,8961				
+4	shelf	678	87	9235	10,7848				
+									
+tárgyak sorrendje	véletlen
+max tárgyak	15
+max térfogat (cm^3)	43500
+policy	skip if doesn't fit
+
+		first fit	iterative	egyenlő	iteratív átlag bepakolt	
+0	m. nincs forgatás	1224	770	8006	10,1794			
+1	m. largest face up	1088	871	8041	10,5971			
+2	m. min slack	1002	945	8053	10,7457			
+3	m. first fit	982	1128	7890	10,7502				
+4	shelf	2419	432	7149	10,4895				
+									
+tárgyak sorrendje	csökkenő térfogat
+max tárgyak	véletlen 5-15 közt
+max térfogat (cm^3)	-
+policy	stop if doesn't fit
+
+		first fit	iterative	egyenlő	first fit átl. pakolt	iteratív átl. bepakolt		
+0	m. nincs forgatás	47	30	9923	4,0811	4,0535		
+1	m. largest face up	45	83	9872	7,1667	7,197		
+2	m. min slack	242	237	9521	7,9023	7,8598		
+3	m. first fit	228	258	9514	7,8432	7,8298			
+4	shelf	599	102	9299	6,7512	6,3828			
+5	extreme points	212	166	9622	7,9942	7,9629			
+									
+tárgyak sorrendje	véletlen
+max tárgyak	véletlen 5-15 közt
+max térfogat (cm^3)	-
+policy	stop if doesn't fit
+
+		first fit	iterative	egyenlő	first fit átl. pakolt	iteratív átl. bepakolt		
+0	m. nincs forgatás	375	260	9365	6,6017	6,5393		
+1	m. largest face up	779	739	8482	8,5055	8,4667		
+2	m. min slack	791	992	8217	8,9201	8,9416		
+3	m. first fit	768	1232	8000	8,8568	8,9637			
+4	shelf	2132	315	7553	8,9924	8,2652			
+5	extreme points	756	981	8263	9,0994	9,1473			

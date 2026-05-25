@@ -1,6 +1,8 @@
 import csv
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
+import pandas as pd
 from pathlib import Path
 
 PLOTS_FOLDER = Path(__file__).resolve().parent
@@ -10,7 +12,7 @@ algos = ["mohó (nem forgat)", "mohó (legnagyobb oldal fenn)", "mohó (min. sla
 def time_plot(file = 'time_raklap', title = ' '):
     data = []
     input = PLOTS_FOLDER / (file + '.csv')
-    output = PLOTS_FOLDER / (file + '.png')
+    output = PLOTS_FOLDER / (file + '.pdf')
     
     with open(input) as file:
         reader = csv.reader(file)
@@ -46,7 +48,7 @@ def time_plot(file = 'time_raklap', title = ' '):
 def win_loss(file = 'winloss_random', title = ' '):
     data = []
     input = PLOTS_FOLDER / (file + '.csv')
-    output = PLOTS_FOLDER / (file + '.png')
+    output = PLOTS_FOLDER / (file + '.pdf')
     
     with open(input) as file:
         reader = csv.reader(file)
@@ -79,10 +81,10 @@ def win_loss(file = 'winloss_random', title = ' '):
     plt.savefig(output)
     plt.show()
 
-def average_packed(file = 'winloss_random', title = ' '):
+def average_packed(file = 'pakolt_random_vs_csokkeno', title = ' '):
     data = []
     input = PLOTS_FOLDER / (file + '.csv')
-    output = PLOTS_FOLDER / (file + '.png')
+    output = PLOTS_FOLDER / (file + '.pdf')
     
     with open(input) as file:
         reader = csv.reader(file)
@@ -116,8 +118,57 @@ def average_packed(file = 'winloss_random', title = ' '):
     plt.savefig(output)
     plt.show()
 
-# time_plot('time_raklap', "Futásidő\nRaklap")
-# time_plot('time_doboz', "Futásidő\nPosta doboz")
-# win_loss('winloss_random', "Hatékonyság\nRandom sorrend")
-# win_loss('winloss_csokkeno', "Hatékonyság\nTérfogat szerint csökkenő sorrend")
+def strategy_heatmap(file = 'strategy_mx', title = ' '):
+    data = []
+    input = PLOTS_FOLDER / (file + '.csv')
+    output = PLOTS_FOLDER / (file + '.pdf')
+
+    with open(input) as file:
+        reader = csv.reader(file)
+        i = 0
+        for row in reader:
+            data.append([])
+            j = 0
+            for col in row:
+                if (0 == i or 0 == j):
+                    data[i].append(col)
+                else:
+                    data[i].append(int(col))
+                j = j+1
+            i = i+1
+
+    dic = {} 
+    strategies = []
+    for i in range(0, len(data[0])):
+        if i == 0:
+            for x in range(1, len(data)):
+                strategies.append(data[x][i])
+        else:    
+            lista = []
+            for x in range(1, len(data)):
+                lista.append(data[x][i])
+                
+            dic[data[0][i]] = lista
+
+    data = dic
+
+    df = pd.DataFrame(data, index=strategies)
+
+    plt.figure(figsize=(10, 6))
+
+    sns.heatmap(df, annot=True, cmap="Blues", fmt="d", cbar_kws={'label': 'Wins (Out of 50)'})
+
+    plt.title("Algorithm Wins by Ordering Strategy (50 Random Scenarios)", pad=20)
+    plt.ylabel("Initial Ordering Strategy")
+    plt.xlabel("Bin Packing Algorithm")
+    plt.xticks(rotation=45, ha='right')
+
+    plt.tight_layout()
+    plt.show()
+
+time_plot('time_raklap', "Futásidő\nRaklap")
+time_plot('time_doboz', "Futásidő\nPosta doboz")
+win_loss('winloss_random', "Hatékonyság\nRandom sorrend")
+win_loss('winloss_csokkeno', "Hatékonyság\nTérfogat szerint csökkenő sorrend")
 average_packed('pakolt_random_vs_csokkeno', "Átlagosan bepakolt elemek")
+strategy_heatmap()#'pakolt_random_vs_csokkeno', "Átlagosan bepakolt elemek")

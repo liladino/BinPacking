@@ -63,6 +63,7 @@ build/
 #test data
 data/*.csv
 *.png
+*.pdf
 
 #cache
 __pycache__

@@ -29,105 +29,103 @@ def generate_inputs(dataset, target_folder, number_of_files, sorted_):
         output_files.append(file)
     return output_files
 
-def runComparison(packer, algorithm, input_file, results, remove_input = False):
+def runComparison(packer, algorithm, input_file, results):
     outfile_iterative = results + "/it.json"
-    outfile_first_fit = results + "/ff.json"
 
     if not os.path.exists(input_file):
-        print("No input file found")
+        print(f"No input file found: {input_file}")
         return None
     
-    args_set_a = ["--input", input_file, "--algorithm", str(algorithm), "--output", outfile_iterative, "--shipEverything"]
-    args_set_b = ["--input", input_file, "--algorithm", str(algorithm), "--output", outfile_first_fit, "--shipEverything", "--firstFit"]
+    args_set = ["--input", input_file, "--algorithm", str(algorithm), "--output", outfile_iterative, "--shipEverything"]
     
     try:
-        subprocess.run([packer] + args_set_a, capture_output=True, text=True)
-        subprocess.run([packer] + args_set_b, capture_output=True, text=True)
+        subprocess.run([packer] + args_set, capture_output=True, text=True)
 
-        if os.path.exists(outfile_iterative) and os.path.exists(outfile_first_fit):
+        if os.path.exists(outfile_iterative):
             try:
-                with open(outfile_first_fit, 'r') as f1, open(outfile_iterative, 'r') as f2:
-                    text1 = f1.read()
-                    text2 = f2.read()
+                with open(outfile_iterative, 'r') as f:
+                    text = f.read()
                 
-                ff_json_data = json.loads(text1)
-                it_json_data = json.loads(text2)
-                
-                ff_bin_needed = len(ff_json_data)
+                it_json_data = json.loads(text)
                 it_bin_needed = len(it_json_data)
 
             except (json.JSONDecodeError, IndexError) as e:
                 print("Invalid JSON")
                 print(e)
                 print("found:")
-                print(text1)
-                print(text2)
+                print(text)
                 return None
-            return ff_bin_needed, it_bin_needed
+                
+            return it_bin_needed
         else:
             print(f"for input: {input_file}")
-            if os.path.exists(outfile_iterative):
-                print("Error: First fit result file not found.")
-            elif os.path.exists(outfile_first_fit):
-                print("Error: Iterative result file not found.")
-            else:
-                print("Error: No result file found.")
+            print("Error: Iterative result file not found.")
             return None
 
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while running the program: {e}")
         return None
     finally:
-        for f in [outfile_iterative, outfile_first_fit]:
-            if os.path.exists(f):
-                os.remove(f)
-        if remove_input and os.path.exists(input_file):
-            os.remove(input_file) 
+        if os.path.exists(outfile_iterative):
+            os.remove(outfile_iterative)
 
-def evaluateComparison(PACKER, RESULTS, OUTPUT_JSON, inputs, tests, remove_input = False):
-    json_rows = []
+def evaluateAlgorithmRun(PACKER, RESULTS, inputs, tests):
+    algo_results = {}
+    
     for name, algo in ALGORITHMS.items():
-        ff_dominant = 0
-        it_dominant = 0
-        ff_total_bins_needed = 0
         it_total_bins_needed = 0
 
         for i in range(tests):
-            res = runComparison(str(PACKER), algo, inputs[i], str(RESULTS), remove_input)
+            res = runComparison(str(PACKER), algo, inputs[i], str(RESULTS))
             if res is not None:
-                ff_bin_needed, it_bin_needed = res
-                
-                ff_total_bins_needed += ff_bin_needed
-                it_total_bins_needed += it_bin_needed
+                it_total_bins_needed += res
 
-        ff_avg_bin_needed = ff_total_bins_needed / tests
         it_avg_bin_needed = it_total_bins_needed / tests
+        algo_results[name] = it_avg_bin_needed
 
-        row = { 
-            "algorithm": name, 
-            "sorted": True, 
-            "samples": tests, 
-            "first_fit": [{ "avg_bin_needed": ff_avg_bin_needed }], 
-            "iterative": [{ "avg_bin_needed": it_avg_bin_needed }] 
-        }
-        json_rows.append(row)
-
-        print(f"Algo {name}:\nfirst fit\tavg bin needed: {ff_avg_bin_needed:.2f}\niterative\tavg bin needed: {it_avg_bin_needed:.2f}")
-
-    with open(OUTPUT_JSON, "w") as file:
-        json.dump(json_rows, file, indent=4)
-
-    print(f"results written to: {OUTPUT_JSON}")
+        print(f"Algo {name}:\tavg bin needed: {it_avg_bin_needed:.2f}")
+        
+    return algo_results
 
 def main():
     TARGETFOLDER = config.PROJECT_ROOT / "data"
     OUTPUT_JSON = config.PROJECT_ROOT / "results/comparison.json"
+    tests = 10000
 
-    tests = 10
-    inputs = generate_inputs(str(config.DATASET), str(TARGETFOLDER), tests, False)
+    print("Generating unsorted inputs...")
+    inputs_unsorted = generate_inputs(str(config.DATASET), str(TARGETFOLDER), tests, sorted_=False)
+    
+    print("\nEvaluating unsorted inputs:")
+    unsorted_results = evaluateAlgorithmRun(config.PACKER_EXECUTABLE, config.RESULTS_DIR, inputs_unsorted, tests)
 
-    print("inputs generated")
-    evaluateComparison(config.PACKER_EXECUTABLE, config.RESULTS_DIR, OUTPUT_JSON, inputs, tests, False)
+    for f in inputs_unsorted:
+        if os.path.exists(f):
+            os.remove(f)
+
+    print("\nGenerating sorted inputs...")
+    inputs_sorted = generate_inputs(str(config.DATASET), str(TARGETFOLDER), tests, sorted_=True)
+    
+    print("\nEvaluating sorted inputs:")
+    sorted_results = evaluateAlgorithmRun(config.PACKER_EXECUTABLE, config.RESULTS_DIR, inputs_sorted, tests)
+    
+    for f in inputs_sorted:
+        if os.path.exists(f):
+            os.remove(f)
+
+    json_rows = []
+    for name in ALGORITHMS.keys():
+        row = { 
+            "algorithm": name, 
+            "samples": tests, 
+            "unsorted": { "avg_bin_needed": unsorted_results.get(name, 0) }, 
+            "sorted": { "avg_bin_needed": sorted_results.get(name, 0) } 
+        }
+        json_rows.append(row)
+
+    with open(OUTPUT_JSON, "w") as file:
+        json.dump(json_rows, file, indent=4)
+
+    print(f"\nResults successfully written to: {OUTPUT_JSON}")
 
 if __name__ == "__main__":
     main()

@@ -104,12 +104,12 @@ def average_packed(file = 'pakolt_random_vs_csokkeno', title = ' '):
 
     plt.figure(figsize=(10, 6))
 
-    plt.bar(x - width/2, data[1], width, label='Csökkenő térfogat', color='#2ca02c') 
-    plt.bar(x + width/2, data[0], width, label='Random', color='#d62728') 
+    plt.bar(x - width/2, data[0], width, label='first fit', color='#2ca02c') 
+    plt.bar(x + width/2, data[1], width, label='iteratív', color='#d62728') 
 
     # Formatting
     plt.title(title)
-    plt.ylabel("Átlag pakolt elemek sorrend alapján")
+    plt.ylabel("Átlagsan szükséges dobozok száma")
     plt.xticks(x, algos, rotation=45)
     plt.legend()
     plt.grid(axis='y', linestyle='--', alpha=0.7)
@@ -156,19 +156,20 @@ def strategy_heatmap(file = 'strategy_mx', title = ' '):
 
     plt.figure(figsize=(10, 6))
 
-    sns.heatmap(df, annot=True, cmap="Blues", fmt="d", cbar_kws={'label': 'Wins (Out of 50)'})
+    sns.heatmap(df, annot=True, cmap="Blues", fmt="d", cbar_kws={'label': '50-ből hány esetben állt fenn a stratégia teljes dominanciája'})
 
-    plt.title("Algorithm Wins by Ordering Strategy (50 Random Scenarios)", pad=20)
-    plt.ylabel("Initial Ordering Strategy")
-    plt.xlabel("Bin Packing Algorithm")
+    plt.title(title, pad=20)
+    plt.ylabel("Rendező stratégia")
+    plt.xlabel("Pakoló algoritmus")
     plt.xticks(rotation=45, ha='right')
 
     plt.tight_layout()
+    plt.savefig(output)
     plt.show()
 
 time_plot('time_raklap', "Futásidő\nRaklap")
 time_plot('time_doboz', "Futásidő\nPosta doboz")
 win_loss('winloss_random', "Hatékonyság\nRandom sorrend")
 win_loss('winloss_csokkeno', "Hatékonyság\nTérfogat szerint csökkenő sorrend")
-average_packed('pakolt_random_vs_csokkeno', "Átlagosan bepakolt elemek")
-strategy_heatmap()#'pakolt_random_vs_csokkeno', "Átlagosan bepakolt elemek")
+average_packed('pakolt', "Hatékonyság csökkenő sorrendezés mellett\nÁtlagosan felhasznált dobozok száma")
+strategy_heatmap('strategy_mx', "Rendező stratégiák hatása algoritmusok sikerességére")

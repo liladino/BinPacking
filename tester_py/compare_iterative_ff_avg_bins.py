@@ -20,8 +20,8 @@ def generate_inputs(dataset, target_folder, number_of_files):
         generate_random_items(
             input_path=dataset, 
             output_path=file, 
-            min_items=5, 
-            max_items=random.randint(5, 25), 
+            min_items=5,
+            max_items=1500,#random.randint(5, 25), 
             max_volume=1e9, 
             printToStdout=False,
             sorted=True) 
@@ -52,7 +52,8 @@ def runComparison(packer, algorithm, input_file, results):
                 
                 ff_json_data = json.loads(text1)
                 it_json_data = json.loads(text2)
-                
+                # print(ff_json_data)
+                # input()
                 ff_bin_needed = len(ff_json_data)
                 it_bin_needed = len(it_json_data)
 
@@ -115,7 +116,7 @@ def evaluateComparison(PACKER, RESULTS, OUTPUT_JSON, inputs, tests):
 def main():
     TARGETFOLDER = config.PROJECT_ROOT / "data"
     OUTPUT_JSON = config.PROJECT_ROOT / "results/comparison.json"
-    tests = 10000
+    tests = 100
 
     print("Generating sorted inputs...")
     inputs_sorted = generate_inputs(str(config.DATASET), str(TARGETFOLDER), tests)

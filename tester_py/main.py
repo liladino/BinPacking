@@ -30,7 +30,7 @@ def main():
     for i in range(num_samples):
         print(f"Processing batch {i+1}/{num_samples}...")
         
-        rows = constrained_random_sample2(str(DATASET), 15, random.randint(15, 35), 1e9)
+        rows = constrained_random_sample2(str(DATASET), 5, random.randint(5, 25), 1e9)
         base_items = rows_into_tuples(rows)
         
         for algo_name, algo_id in ALGORITHMS.items():

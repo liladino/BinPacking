@@ -156,7 +156,7 @@ def strategy_heatmap(file = 'strategy_mx', title = ' '):
 
     plt.figure(figsize=(10, 6))
 
-    sns.heatmap(df, annot=True, cmap="Blues", fmt="d", cbar_kws={'label': '50-ből hány esetben állt fenn a stratégia teljes dominanciája'})
+    sns.heatmap(df, annot=True, cmap="Blues", fmt="d", cbar_kws={'label': '1000-ből hány esetben állt fenn a stratégia teljes dominanciája'})
 
     plt.title(title, pad=20)
     plt.ylabel("Rendező stratégia")
@@ -171,5 +171,5 @@ time_plot('time_raklap', "Futásidő\nRaklap")
 time_plot('time_doboz', "Futásidő\nPosta doboz")
 win_loss('winloss_random', "Hatékonyság\nRandom sorrend")
 win_loss('winloss_csokkeno', "Hatékonyság\nTérfogat szerint csökkenő sorrend")
-average_packed('pakolt', "Hatékonyság csökkenő sorrendezés mellett\nÁtlagosan felhasznált dobozok száma")
-strategy_heatmap('strategy_mx', "Rendező stratégiák hatása algoritmusok sikerességére")
+average_packed('pakolt2', "Hatékonyság csökkenő sorrendezés mellett\nÁtlagosan felhasznált dobozok száma")
+strategy_heatmap('strategy_mx', "Rendező stratégiák hatása heurisztikák sikerességére")

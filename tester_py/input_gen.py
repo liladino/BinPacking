@@ -120,7 +120,7 @@ def main():
 
     args = parser.parse_args()
 
-    generate_random_items(args.input, output_path=args.output, min_items=1, max_items=args.max_items, max_volume=args.max_volume, printToStdout=True)
+    generate_random_items(args.input, output_path=args.output, min_items=1, max_items=args.max_items, max_volume=args.max_volume, printToStdout=True, sorted=args.sorted)
     
 if __name__ == "__main__":
     main()

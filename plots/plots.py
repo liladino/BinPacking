@@ -102,14 +102,14 @@ def average_packed(file = 'pakolt_random_vs_csokkeno', title = ' '):
     x = np.arange(len(algos))
     width = 0.35 
 
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(8, 6))
 
-    plt.bar(x - width/2, data[0], width, label='first fit', color='#2ca02c') 
-    plt.bar(x + width/2, data[1], width, label='iteratív', color='#d62728') 
+    plt.bar(x - width/2, data[0], width, label='first fit', color='blue') 
+    plt.bar(x + width/2, data[1], width, label='iteratív', color='orange') 
 
     # Formatting
     plt.title(title)
-    plt.ylabel("Átlagsan szükséges dobozok száma")
+    plt.ylabel("Átlagsan szükséges raklapok száma")
     plt.xticks(x, algos, rotation=45)
     plt.legend()
     plt.grid(axis='y', linestyle='--', alpha=0.7)
@@ -171,5 +171,5 @@ time_plot('time_raklap', "Futásidő\nRaklap")
 time_plot('time_doboz', "Futásidő\nPosta doboz")
 win_loss('winloss_random', "Hatékonyság\nRandom sorrend")
 win_loss('winloss_csokkeno', "Hatékonyság\nTérfogat szerint csökkenő sorrend")
-average_packed('pakolt2', "Hatékonyság csökkenő sorrendezés mellett\nÁtlagosan felhasznált dobozok száma")
+average_packed('pakolt2', "Hatékonyság csökkenő sorrendezés mellett\nÁtlagosan felhasznált raklapok száma")
 strategy_heatmap('strategy_mx', "Rendező stratégiák hatása heurisztikák sikerességére")
